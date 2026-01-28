@@ -22,6 +22,10 @@ import { CardItem } from '../components/CardItem';
 import { BoardHeader } from '../components/BoardHeader';
 import { BoardToolbar } from '../components/BoardToolbar';
 import { ArchiveDrawer } from '../components/ArchiveDrawer';
+import { ViewSwitcher } from '../components/ViewSwitcher';
+import { TableView } from '../components/TableView';
+import { TimelineView } from '../components/TimelineView';
+import { DashboardView } from '../components/DashboardView';
 import styles from './BoardPage.module.css';
 
 export function BoardPage() {
@@ -64,6 +68,7 @@ export function BoardPage() {
   const [filterLabels, setFilterLabels] = useState([]);
   const [filterMembers, setFilterMembers] = useState([]);
   const [searchQuery, setSearchQuery] = useState('');
+  const [currentView, setCurrentView] = useState('kanban');
 
   useEffect(() => {
     fetchBoard(boardId);
@@ -251,6 +256,12 @@ export function BoardPage() {
     return { backgroundColor: bg.value };
   };
 
+  const getStatusColor = (listId) => {
+    const colors = ['#007bff', '#ffc107', '#28a745', '#dc3545', '#6f42c1', '#fd7e14'];
+    const index = lists.findIndex((l) => l.id === listId);
+    return colors[index % colors.length];
+  };
+
   if (!activeBoard && loading) {
     return <div className={styles.loading}>Loading board…</div>;
   }
@@ -294,7 +305,10 @@ export function BoardPage() {
         onShowArchive={() => setShowArchive(true)}
       />
 
-      <DndContext
+      <ViewSwitcher currentView={currentView} onViewChange={setCurrentView} />
+
+      {currentView === 'kanban' && (
+        <DndContext
         sensors={sensors}
         collisionDetection={closestCorners}
         onDragStart={handleDragStart}
@@ -310,6 +324,7 @@ export function BoardPage() {
                   list={list}
                   boardLabels={activeBoard.labels}
                   boardMembers={activeBoard.members}
+                  color={getStatusColor(list.id)}
                   onCreateCard={(listId, payload) => createCard(boardId, listId, payload)}
                   onOpenCard={(card) => handleOpenCard(card, list.id)}
                   onUpdateList={(listId, payload) => updateList(boardId, listId, payload)}
@@ -342,6 +357,39 @@ export function BoardPage() {
           )}
         </DragOverlay>
       </DndContext>
+      )}
+
+      {currentView === 'table' && (
+        <TableView
+          lists={filteredLists}
+          boardLabels={activeBoard.labels}
+          boardMembers={activeBoard.members}
+          onUpdateCard={(cardId, payload) => updateCard(boardId, cardId, payload)}
+          onMoveCard={(sourceListId, targetListId, cardId, position) => moveCard(boardId, cardId, sourceListId, targetListId, position)}
+        />
+      )}
+
+      {currentView === 'timeline' && (
+        <TimelineView
+          lists={filteredLists}
+          boardLabels={activeBoard.labels}
+          boardMembers={activeBoard.members}
+        />
+      )}
+
+      {currentView === 'dashboard' && (
+        <DashboardView
+          lists={filteredLists}
+          boardLabels={activeBoard.labels}
+          boardMembers={activeBoard.members}
+        />
+      )}
+
+      {(currentView !== 'kanban' && currentView !== 'table' && currentView !== 'timeline' && currentView !== 'dashboard') && (
+        <div className={styles.placeholder}>
+          {currentView.charAt(0).toUpperCase() + currentView.slice(1)} view is not implemented yet.
+        </div>
+      )}
 
       {selected && (
         <CardModal

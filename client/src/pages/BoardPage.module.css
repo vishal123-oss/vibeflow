@@ -17,6 +17,27 @@
   min-height: 100%;
 }
 
+@media (max-width: 768px) {
+  .boardWrapper {
+    padding: var(--space-md);
+  }
+
+  .board {
+    gap: var(--space-sm);
+  }
+}
+
+@media (max-width: 480px) {
+  .boardWrapper {
+    padding: var(--space-sm);
+  }
+
+  .board {
+    gap: var(--space-xs);
+    flex-direction: column;
+  }
+}
+
 .banner {
   display: flex;
   align-items: center;
@@ -80,5 +101,11 @@
 
 .listPlaceholder span {
   font-size: 0.8rem;
+  color: var(--text-muted);
+}
+
+.placeholder {
+  padding: var(--space-xl);
+  text-align: center;
   color: var(--text-muted);
 }

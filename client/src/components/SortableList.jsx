@@ -15,6 +15,7 @@ export function SortableList({
   onUpdateList,
   onArchiveList,
   onDeleteList,
+  color,
 }) {
   const [editing, setEditing] = useState(false);
   const [title, setTitle] = useState(list.title);
@@ -64,7 +65,7 @@ export function SortableList({
 
   return (
     <div ref={setNodeRef} style={style} className={styles.column}>
-      <div className={styles.header} {...attributes} {...listeners}>
+      <div className={styles.header} style={{ borderTopColor: color }} {...attributes} {...listeners}>
         {editing ? (
           <form onSubmit={submitTitle} className={styles.editForm}>
             <input

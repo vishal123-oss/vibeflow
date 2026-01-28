@@ -1,0 +1,50 @@
+.switcher {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+}
+
+.button {
+  padding: 8px 16px;
+  border: 1px solid #ccc;
+  background: #fff;
+  cursor: pointer;
+  border-radius: 4px;
+  font-size: 14px;
+  transition: background-color 0.2s;
+  flex: 1;
+  min-width: 0;
+  white-space: nowrap;
+}
+
+.button:hover {
+  background: #f0f0f0;
+}
+
+.button.active {
+  background: #007bff;
+  color: #fff;
+  border-color: #007bff;
+}
+
+@media (max-width: 768px) {
+  .switcher {
+    gap: 4px;
+    margin-bottom: 12px;
+  }
+
+  .button {
+    padding: 6px 12px;
+    font-size: 13px;
+    flex-basis: calc(50% - 4px);
+  }
+}
+
+@media (max-width: 480px) {
+  .button {
+    padding: 6px 8px;
+    font-size: 12px;
+    flex-basis: 100%;
+  }
+}

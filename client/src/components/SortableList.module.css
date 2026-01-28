@@ -11,12 +11,32 @@
   max-height: calc(100vh - 220px);
 }
 
+@media (max-width: 768px) {
+  .column {
+    min-width: 240px;
+    max-width: 240px;
+    padding: var(--space-xs);
+    max-height: calc(100vh - 180px);
+  }
+}
+
+@media (max-width: 480px) {
+  .column {
+    min-width: 100%;
+    max-width: 100%;
+    padding: var(--space-xs);
+    max-height: none;
+  }
+}
+
 .header {
   display: flex;
   align-items: center;
   justify-content: space-between;
   padding: var(--space-xs) var(--space-sm);
   cursor: grab;
+  border-top: 4px solid transparent;
+  border-radius: var(--radius-md) var(--radius-md) 0 0;
 }
 
 .header:active {
