@@ -1,0 +1,97 @@
+/**
+ * VibeFlow Design Tokens — Theme Engine
+ * CSS variables for consistent styling. Glassmorphism UI.
+ */
+
+:root {
+  /* Background */
+  --bg-primary: #0f0f14;
+  --bg-secondary: #16161d;
+  --bg-tertiary: #1c1c26;
+  --bg-overlay: rgba(22, 22, 29, 0.6);
+
+  /* Glassmorphism */
+  --glass-bg: rgba(255, 255, 255, 0.04);
+  --glass-border: rgba(255, 255, 255, 0.08);
+  --glass-blur: 12px;
+  --glass-blur-strong: 20px;
+
+  /* Accent & glow */
+  --accent: #7c5cff;
+  --accent-hover: #9378ff;
+  --accent-muted: rgba(124, 92, 255, 0.25);
+  --accent-glow: 0 0 24px rgba(124, 92, 255, 0.35);
+  --accent-glow-subtle: 0 0 12px rgba(124, 92, 255, 0.2);
+
+  /* Cards */
+  --card-bg: rgba(255, 255, 255, 0.03);
+  --card-border: rgba(255, 255, 255, 0.06);
+  --card-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+  --card-shadow-hover: 0 12px 40px rgba(0, 0, 0, 0.4);
+
+  /* Text */
+  --text-primary: #f0f0f5;
+  --text-secondary: #a0a0b0;
+  --text-muted: #606070;
+
+  /* Status */
+  --success: #34d399;
+  --warning: #fbbf24;
+  --error: #f87171;
+  --info: #60a5fa;
+
+  /* Transitions */
+  --transition-speed: 0.2s;
+  --transition-speed-slow: 0.35s;
+  --ease-out: cubic-bezier(0.25, 0.46, 0.45, 0.94);
+
+  /* Spacing */
+  --space-xs: 4px;
+  --space-sm: 8px;
+  --space-md: 16px;
+  --space-lg: 24px;
+  --space-xl: 32px;
+
+  /* Radius */
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 14px;
+  --radius-xl: 20px;
+
+  /* Typography */
+  --font-sans: 'DM Sans', system-ui, sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
+}
+
+/* Glassmorphism utilities */
+.glass {
+  background: var(--glass-bg);
+  backdrop-filter: blur(var(--glass-blur));
+  -webkit-backdrop-filter: blur(var(--glass-blur));
+  border: 1px solid var(--glass-border);
+  box-shadow: var(--card-shadow);
+}
+
+.glass-strong {
+  background: rgba(255, 255, 255, 0.06);
+  backdrop-filter: blur(var(--glass-blur-strong));
+  -webkit-backdrop-filter: blur(var(--glass-blur-strong));
+  border: 1px solid var(--glass-border);
+  box-shadow: var(--card-shadow);
+}
+
+.card-glass {
+  background: var(--card-bg);
+  backdrop-filter: blur(var(--glass-blur));
+  -webkit-backdrop-filter: blur(var(--glass-blur));
+  border: 1px solid var(--card-border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--card-shadow);
+  transition: box-shadow var(--transition-speed) var(--ease-out),
+    border-color var(--transition-speed) var(--ease-out);
+}
+
+.card-glass:hover {
+  box-shadow: var(--card-shadow-hover), var(--accent-glow-subtle);
+  border-color: rgba(255, 255, 255, 0.1);
+}

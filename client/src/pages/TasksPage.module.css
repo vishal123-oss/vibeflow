@@ -1,0 +1,101 @@
+.page {
+  padding: var(--space-xl);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-lg);
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-lg);
+}
+
+.header h2 {
+  margin: 0;
+  font-size: 1.5rem;
+}
+
+.header p {
+  margin: var(--space-xs) 0 0;
+  color: var(--text-muted);
+}
+
+.actions {
+  display: flex;
+  gap: var(--space-sm);
+}
+
+.reset {
+  padding: var(--space-sm) var(--space-md);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-md);
+  background: rgba(88, 101, 242, 0.12);
+  color: var(--text-primary);
+}
+
+.reset:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.form {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: var(--space-md);
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  border-radius: var(--radius-lg);
+  padding: var(--space-lg);
+  box-shadow: var(--card-shadow);
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+}
+
+.field label {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.field input,
+.field textarea,
+.field select {
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-sm);
+  padding: var(--space-sm);
+  color: var(--text-primary);
+}
+
+.actionsRow {
+  display: flex;
+  align-items: flex-end;
+}
+
+.actionsRow button {
+  padding: var(--space-sm) var(--space-md);
+  border: 1px solid var(--accent);
+  border-radius: var(--radius-sm);
+  background: var(--accent-muted);
+  color: var(--accent);
+  font-weight: 600;
+  transition: all var(--transition-speed) var(--ease-out);
+}
+
+.actionsRow button:hover:not(:disabled) {
+  background: var(--accent);
+  color: var(--bg-primary);
+  box-shadow: var(--accent-glow-subtle);
+}
+
+.actionsRow button:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}

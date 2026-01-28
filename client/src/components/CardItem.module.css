@@ -1,0 +1,139 @@
+.card {
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  cursor: pointer;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+.card.dragging {
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+}
+
+.cover {
+  height: 32px;
+  background-size: cover;
+  background-position: center;
+}
+
+.content {
+  padding: var(--space-sm);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+}
+
+.labels {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+
+.label {
+  padding: 2px 8px;
+  border-radius: var(--radius-sm);
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: white;
+  text-shadow: 0 1px 1px rgba(0, 0, 0, 0.2);
+}
+
+.title {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--text-primary);
+  line-height: 1.4;
+}
+
+.badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  align-items: center;
+}
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  padding: 2px 6px;
+  background: rgba(255, 255, 255, 0.06);
+  border-radius: var(--radius-sm);
+  font-size: 0.7rem;
+  color: var(--text-muted);
+}
+
+.badge svg {
+  opacity: 0.7;
+}
+
+.due {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.due.complete {
+  background: rgba(52, 211, 153, 0.2);
+  color: var(--success);
+}
+
+.due.overdue {
+  background: rgba(248, 113, 113, 0.2);
+  color: var(--error);
+}
+
+.due.soon {
+  background: rgba(251, 191, 36, 0.2);
+  color: var(--warning);
+}
+
+.checkComplete {
+  background: rgba(52, 211, 153, 0.2);
+  color: var(--success);
+}
+
+.members {
+  display: flex;
+  justify-content: flex-end;
+  gap: -4px;
+  margin-top: var(--space-xs);
+}
+
+.avatar {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: var(--accent-muted);
+  color: var(--accent);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.65rem;
+  font-weight: 600;
+  border: 2px solid var(--card-bg);
+  margin-left: -6px;
+}
+
+.avatar:first-child {
+  margin-left: 0;
+}
+
+.avatarMore {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.1);
+  color: var(--text-muted);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.6rem;
+  font-weight: 600;
+  border: 2px solid var(--card-bg);
+  margin-left: -6px;
+}

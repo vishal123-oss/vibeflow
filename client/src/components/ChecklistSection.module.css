@@ -1,0 +1,218 @@
+.section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-lg);
+}
+
+.checklist {
+  margin-bottom: var(--space-md);
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  margin-bottom: var(--space-sm);
+}
+
+.header svg {
+  color: var(--text-muted);
+}
+
+.header h4 {
+  margin: 0;
+  font-size: 0.9rem;
+  flex: 1;
+  cursor: pointer;
+  padding: var(--space-xs);
+  margin: -4px;
+  border-radius: var(--radius-sm);
+}
+
+.header h4:hover {
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.titleInput {
+  flex: 1;
+  padding: var(--space-xs);
+  background: rgba(255, 255, 255, 0.08);
+  border: 2px solid var(--accent);
+  border-radius: var(--radius-sm);
+  color: var(--text-primary);
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.deleteBtn {
+  background: transparent;
+  border: none;
+  color: var(--text-muted);
+  font-size: 0.8rem;
+  cursor: pointer;
+  padding: var(--space-xs) var(--space-sm);
+  border-radius: var(--radius-sm);
+}
+
+.deleteBtn:hover {
+  background: rgba(248, 113, 113, 0.15);
+  color: var(--error);
+}
+
+.progressBar {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  margin-bottom: var(--space-sm);
+}
+
+.progressText {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  width: 32px;
+}
+
+.progressTrack {
+  flex: 1;
+  height: 6px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.progressFill {
+  height: 100%;
+  background: var(--accent);
+  border-radius: 3px;
+  transition: width 0.3s ease;
+}
+
+.progressFill[data-complete='true'] {
+  background: var(--success);
+}
+
+.items {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+}
+
+.item {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  padding: var(--space-xs);
+  border-radius: var(--radius-sm);
+  transition: background 0.15s;
+}
+
+.item:hover {
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.itemLabel {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  cursor: pointer;
+}
+
+.itemLabel input {
+  width: 16px;
+  height: 16px;
+  cursor: pointer;
+}
+
+.itemLabel span {
+  font-size: 0.85rem;
+}
+
+.itemLabel .completed {
+  text-decoration: line-through;
+  color: var(--text-muted);
+}
+
+.itemDelete {
+  background: transparent;
+  border: none;
+  color: var(--text-muted);
+  font-size: 1rem;
+  cursor: pointer;
+  padding: 0;
+  opacity: 0;
+  transition: opacity 0.15s;
+}
+
+.item:hover .itemDelete {
+  opacity: 1;
+}
+
+.itemDelete:hover {
+  color: var(--error);
+}
+
+.addForm {
+  margin-top: var(--space-sm);
+}
+
+.addForm input {
+  width: 100%;
+  padding: var(--space-sm);
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-sm);
+  color: var(--text-primary);
+  font-size: 0.85rem;
+  margin-bottom: var(--space-xs);
+}
+
+.addForm input:focus {
+  outline: none;
+  border-color: var(--accent);
+}
+
+.addActions {
+  display: flex;
+  gap: var(--space-xs);
+}
+
+.addActions button {
+  padding: var(--space-xs) var(--space-sm);
+  border-radius: var(--radius-sm);
+  font-size: 0.8rem;
+  cursor: pointer;
+}
+
+.addActions button[type='submit'] {
+  background: var(--accent);
+  border: none;
+  color: white;
+}
+
+.addActions button[type='button'] {
+  background: transparent;
+  border: none;
+  color: var(--text-muted);
+}
+
+.addBtn {
+  background: rgba(255, 255, 255, 0.06);
+  border: none;
+  border-radius: var(--radius-sm);
+  padding: var(--space-sm);
+  color: var(--text-secondary);
+  font-size: 0.85rem;
+  cursor: pointer;
+  width: 100%;
+  text-align: left;
+  margin-top: var(--space-sm);
+  transition: background 0.15s;
+}
+
+.addBtn:hover {
+  background: rgba(255, 255, 255, 0.1);
+}

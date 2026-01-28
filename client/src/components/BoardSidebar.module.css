@@ -1,0 +1,100 @@
+.sidebar {
+  width: 260px;
+  flex-shrink: 0;
+  padding: var(--space-lg);
+}
+
+.glass {
+  background: var(--glass-bg);
+  backdrop-filter: blur(var(--glass-blur));
+  -webkit-backdrop-filter: blur(var(--glass-blur));
+  border: 1px solid var(--glass-border);
+  box-shadow: var(--card-shadow);
+  padding: var(--space-lg);
+  border-radius: var(--radius-lg);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-lg);
+  min-height: calc(100vh - 2 * var(--space-lg));
+}
+
+.brand {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.brand small {
+  color: var(--text-muted);
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.nav {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+}
+
+.nav a {
+  padding: var(--space-sm) var(--space-md);
+  border-radius: var(--radius-sm);
+  color: var(--text-secondary);
+  transition: color var(--transition-speed) var(--ease-out),
+    background var(--transition-speed) var(--ease-out);
+}
+
+.nav a:hover {
+  color: var(--text-primary);
+  background: var(--accent-muted);
+}
+
+.nav a.active {
+  color: var(--accent);
+  background: var(--accent-muted);
+  font-weight: 600;
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+  padding-top: var(--space-md);
+  border-top: 1px solid var(--glass-border);
+}
+
+.form h3 {
+  margin: 0;
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text-muted);
+}
+
+.form input,
+.form textarea {
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-sm);
+  padding: var(--space-sm);
+  color: var(--text-primary);
+}
+
+.form button {
+  padding: var(--space-sm) var(--space-md);
+  border: 1px solid var(--accent);
+  border-radius: var(--radius-sm);
+  background: var(--accent-muted);
+  color: var(--accent);
+  font-weight: 600;
+  transition: all var(--transition-speed) var(--ease-out);
+}
+
+.form button:hover:not(:disabled) {
+  background: var(--accent);
+  color: var(--bg-primary);
+  box-shadow: var(--accent-glow-subtle);
+}
