@@ -1,0 +1,44 @@
+{
+  "id": "vibe-103",
+  "content": {
+    "title": "Implement TaskProvider",
+    "body": "Context API with optimistic updates"
+  },
+  "meta": {
+    "assignee": "User1",
+    "labels": [
+      "frontend",
+      "state"
+    ],
+    "priority": "high"
+  },
+  "history": [
+    {
+      "action": "created",
+      "timestamp": "2026-01-25T10:10:00.000Z"
+    }
+  ],
+  "checklists": [
+    {
+      "id": "check-2",
+      "title": "Provider setup",
+      "items": [
+        {
+          "id": "item-3",
+          "text": "Create context",
+          "completed": true
+        },
+        {
+          "id": "item-4",
+          "text": "Add reducer",
+          "completed": true
+        },
+        {
+          "id": "item-5",
+          "text": "Connect components",
+          "completed": false
+        }
+      ]
+    }
+  ]
+}

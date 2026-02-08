@@ -1,0 +1,16 @@
+{
+  "id": "user-mle1u588-jkas",
+  "email": "test@gmail.com",
+  "hashedPassword": "$2b$10$XlNUAb0cVIQE8mwC1xR0zO7ZqM4ZqsGm6pHjp72W/riHwVGIIw0hy",
+  "password": "123456789",
+  "firstName": "Vishal",
+  "lastName": "Sharma",
+  "avatar": null,
+  "initials": "VS",
+  "role": "user",
+  "address": "",
+  "bio": "",
+  "createdAt": "2026-02-08T18:00:51.704Z",
+  "updatedAt": "2026-02-08T18:00:51.704Z",
+  "inactive": false
+}

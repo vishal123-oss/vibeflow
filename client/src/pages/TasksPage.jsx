@@ -1,9 +1,9 @@
 import { useState } from 'react';
 import { TaskList } from '../components/TaskList';
 import { useTasks } from '../context/TaskContext';
+import { useAuth } from '../context/AuthContext';
 import styles from './TasksPage.module.css';
 
-const ASSIGNEES = ['User1', 'User2'];
 const PRIORITIES = [
   { value: 'high', label: 'High' },
   { value: 'medium', label: 'Medium' },
@@ -20,6 +20,7 @@ const initialForm = {
 
 export function TasksPage() {
   const { addTask, resetTasks, loading } = useTasks();
+  const { users } = useAuth();
   const [form, setForm] = useState(initialForm);
 
   const handleChange = (key) => (event) => {
@@ -86,9 +87,9 @@ export function TasksPage() {
           <label htmlFor="task-assignee">Assignee</label>
           <select id="task-assignee" value={form.assignee} onChange={handleChange('assignee')}>
             <option value="">Unassigned</option>
-            {ASSIGNEES.map((person) => (
-              <option key={person} value={person}>
-                {person}
+            {users.map((u) => (
+              <option key={u.id} value={u.id}>
+                {`${u.firstName} ${u.lastName}`}
               </option>
             ))}
           </select>

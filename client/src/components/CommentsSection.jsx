@@ -1,7 +1,9 @@
 import { useState } from 'react';
+import { useAuth } from '../context/AuthContext';
 import styles from './CommentsSection.module.css';
 
 export function CommentsSection({ comments, boardMembers, onAdd, onDelete }) {
+  const { user } = useAuth();
   const [newComment, setNewComment] = useState('');
   const [isAdding, setIsAdding] = useState(false);
 
@@ -9,7 +11,7 @@ export function CommentsSection({ comments, boardMembers, onAdd, onDelete }) {
     e.preventDefault();
     if (!newComment.trim()) return;
     setIsAdding(true);
-    await onAdd({ text: newComment.trim(), author: 'user-1' });
+    await onAdd({ text: newComment.trim(), author: user?.id || 'user-1' });
     setNewComment('');
     setIsAdding(false);
   };
@@ -70,7 +72,9 @@ export function CommentsSection({ comments, boardMembers, onAdd, onDelete }) {
               </div>
               <div className={styles.commentContent}>
                 <div className={styles.commentHeader}>
-                  <strong>{member?.name || comment.author || 'User'}</strong>
+                  <strong>
+                    {member?.name || `${member?.firstName || ''} ${member?.lastName || ''}`.trim() || comment.author || 'User'}
+                  </strong>
                   <span className={styles.time}>{formatDate(comment.createdAt)}</span>
                 </div>
                 <p className={styles.commentText}>{comment.text}</p>

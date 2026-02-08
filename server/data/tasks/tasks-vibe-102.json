@@ -1,0 +1,23 @@
+{
+  "id": "vibe-102",
+  "content": {
+    "title": "Add Theme Engine",
+    "body": "Create theme.css with design tokens"
+  },
+  "meta": {
+    "assignee": "User2",
+    "labels": [
+      "frontend",
+      "design"
+    ],
+    "priority": "medium",
+    "dueDate": "2026-01-30T00:00:00.000Z"
+  },
+  "history": [
+    {
+      "action": "created",
+      "timestamp": "2026-01-25T10:05:00.000Z"
+    }
+  ],
+  "checklists": []
+}

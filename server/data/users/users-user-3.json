@@ -1,0 +1,10 @@
+{
+  "id": "user-3",
+  "email": "carol@example.com",
+  "password": "$2b$10$dummyhashforcarol",
+  "name": "Carol Davis",
+  "avatar": null,
+  "initials": "CD",
+  "role": "user",
+  "createdAt": "2026-01-25T10:02:00.000Z"
+}

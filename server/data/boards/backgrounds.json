@@ -1,0 +1,12 @@
+[
+  { "id": "gradient-purple", "type": "gradient", "value": "linear-gradient(135deg, #667eea 0%, #764ba2 100%)" },
+  { "id": "gradient-blue", "type": "gradient", "value": "linear-gradient(135deg, #0093E9 0%, #80D0C7 100%)" },
+  { "id": "gradient-green", "type": "gradient", "value": "linear-gradient(135deg, #11998e 0%, #38ef7d 100%)" },
+  { "id": "gradient-orange", "type": "gradient", "value": "linear-gradient(135deg, #f093fb 0%, #f5576c 100%)" },
+  { "id": "gradient-dark", "type": "gradient", "value": "linear-gradient(135deg, #1a1a2e 0%, #16213e 100%)" },
+  { "id": "solid-blue", "type": "solid", "value": "#0079bf" },
+  { "id": "solid-green", "type": "solid", "value": "#519839" },
+  { "id": "solid-orange", "type": "solid", "value": "#d29034" },
+  { "id": "solid-red", "type": "solid", "value": "#b04632" },
+  { "id": "solid-purple", "type": "solid", "value": "#89609e" }
+]

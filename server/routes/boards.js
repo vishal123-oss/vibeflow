@@ -4,38 +4,46 @@ import * as store from '../data/boards.js';
 const router = Router();
 
 // Static data routes
-router.get('/meta/label-colors', (req, res) => {
-  res.json(store.getLabelColors());
+router.get('/meta/label-colors', async (req, res, next) => {
+  try {
+    res.json(await store.getLabelColors());
+  } catch (e) {
+    next(e);
+  }
 });
 
-router.get('/meta/backgrounds', (req, res) => {
-  res.json(store.getBoardBackgrounds());
+router.get('/meta/backgrounds', async (req, res, next) => {
+  try {
+    res.json(await store.getBoardBackgrounds());
+  } catch (e) {
+    next(e);
+  }
 });
 
 // Reset boards (demo data)
-router.post('/reset', (req, res, next) => {
+router.post('/reset', async (req, res, next) => {
   try {
-    store.resetBoards();
-    res.json(store.getBoards());
+    await store.resetBoards();
+    res.json(await store.getBoards());
   } catch (e) {
     next(e);
   }
 });
 
 // Board routes
-router.get('/', (req, res, next) => {
+router.get('/', async (req, res, next) => {
   try {
     const includeArchived = req.query.archived === 'true';
-    res.json(store.getBoards(includeArchived));
+    res.json(await store.getBoards(includeArchived));
   } catch (e) {
     next(e);
   }
 });
 
-router.get('/:boardId', (req, res, next) => {
+router.get('/:boardId', async (req, res, next) => {
   try {
     const includeArchived = req.query.archived === 'true';
-    const board = store.getBoard(req.params.boardId, includeArchived);
+    const board = await store.getBoard(req.params.boardId, includeArchived);
     if (!board) {
       const err = new Error('Board not found');
       err.status = 404;
@@ -47,18 +55,18 @@ router.get('/:boardId', (req, res, next) => {
   }
 });
 
-router.post('/', (req, res, next) => {
+router.post('/', async (req, res, next) => {
   try {
-    const board = store.createBoard(req.body);
+    const board = await store.createBoard(req.body);
     res.status(201).json(board);
   } catch (e) {
     next(e);
   }
 });
 
-router.patch('/:boardId', (req, res, next) => {
+router.patch('/:boardId', async (req, res, next) => {
   try {
-    const board = store.updateBoard(req.params.boardId, req.body);
+    const board = await store.updateBoard(req.params.boardId, req.body);
     if (!board) {
       const err = new Error('Board not found');
       err.status = 404;
@@ -70,9 +78,9 @@ router.patch('/:boardId', (req, res, next) => {
   }
 });
 
-router.delete('/:boardId', (req, res, next) => {
+router.delete('/:boardId', async (req, res, next) => {
   try {
-    const board = store.removeBoard(req.params.boardId);
+    const board = await store.removeBoard(req.params.boardId);
     if (!board) {
       const err = new Error('Board not found');
       err.status = 404;
@@ -85,10 +93,10 @@ router.delete('/:boardId', (req, res, next) => {
 });
 
 // Board search
-router.get('/:boardId/search', (req, res, next) => {
+router.get('/:boardId/search', async (req, res, next) => {
   try {
     const query = req.query.q || '';
-    const results = store.searchCards(req.params.boardId, query);
+    const results = await store.searchCards(req.params.boardId, query);
     res.json(results);
   } catch (e) {
     next(e);
@@ -96,9 +104,9 @@ router.get('/:boardId/search', (req, res, next) => {
 });
 
 // Board labels
-router.post('/:boardId/labels', (req, res, next) => {
+router.post('/:boardId/labels', async (req, res, next) => {
   try {
-    const label = store.addBoardLabel(req.params.boardId, req.body);
+    const label = await store.addBoardLabel(req.params.boardId, req.body);
     if (!label) {
       const err = new Error('Board not found');
       err.status = 404;
@@ -110,9 +118,9 @@ router.post('/:boardId/labels', (req, res, next) => {
   }
 });
 
-router.patch('/:boardId/labels/:labelId', (req, res, next) => {
+router.patch('/:boardId/labels/:labelId', async (req, res, next) => {
   try {
-    const label = store.updateBoardLabel(req.params.boardId, req.params.labelId, req.body);
+    const label = await store.updateBoardLabel(req.params.boardId, req.params.labelId, req.body);
     if (!label) {
       const err = new Error('Label not found');
       err.status = 404;
@@ -124,9 +132,9 @@ router.patch('/:boardId/labels/:labelId', (req, res, next) => {
   }
 });
 
-router.delete('/:boardId/labels/:labelId', (req, res, next) => {
+router.delete('/:boardId/labels/:labelId', async (req, res, next) => {
   try {
-    const label = store.removeBoardLabel(req.params.boardId, req.params.labelId);
+    const label = await store.removeBoardLabel(req.params.boardId, req.params.labelId);
     if (!label) {
       const err = new Error('Label not found');
       err.status = 404;
@@ -139,9 +147,9 @@ router.delete('/:boardId/labels/:labelId', (req, res, next) => {
 });
 
 // Archive routes
-router.get('/:boardId/archive/cards', (req, res, next) => {
+router.get('/:boardId/archive/cards', async (req, res, next) => {
   try {
-    const cards = store.getArchivedCards(req.params.boardId);
+    const cards = await store.getArchivedCards(req.params.boardId);
     if (!cards) {
       const err = new Error('Board not found');
       err.status = 404;
@@ -153,9 +161,9 @@ router.get('/:boardId/archive/cards', (req, res, next) => {
   }
 });
 
-router.get('/:boardId/archive/lists', (req, res, next) => {
+router.get('/:boardId/archive/lists', async (req, res, next) => {
   try {
-    const lists = store.getArchivedLists(req.params.boardId);
+    const lists = await store.getArchivedLists(req.params.boardId);
     if (!lists) {
       const err = new Error('Board not found');
       err.status = 404;
@@ -167,9 +175,9 @@ router.get('/:boardId/archive/lists', (req, res, next) => {
   }
 });
 
-router.post('/:boardId/archive/cards/:cardId/restore', (req, res, next) => {
+router.post('/:boardId/archive/cards/:cardId/restore', async (req, res, next) => {
   try {
-    const card = store.restoreCard(req.params.boardId, req.params.cardId);
+    const card = await store.restoreCard(req.params.boardId, req.params.cardId);
     if (!card) {
       const err = new Error('Card not found');
       err.status = 404;
@@ -181,9 +189,9 @@ router.post('/:boardId/archive/cards/:cardId/restore', (req, res, next) => {
   }
 });
 
-router.post('/:boardId/archive/lists/:listId/restore', (req, res, next) => {
+router.post('/:boardId/archive/lists/:listId/restore', async (req, res, next) => {
   try {
-    const list = store.restoreList(req.params.boardId, req.params.listId);
+    const list = await store.restoreList(req.params.boardId, req.params.listId);
     if (!list) {
       const err = new Error('List not found');
       err.status = 404;
@@ -196,9 +204,9 @@ router.post('/:boardId/archive/lists/:listId/restore', (req, res, next) => {
 });
 
 // List routes
-router.post('/:boardId/lists', (req, res, next) => {
+router.post('/:boardId/lists', async (req, res, next) => {
   try {
-    const list = store.createList(req.params.boardId, req.body);
+    const list = await store.createList(req.params.boardId, req.body);
     if (!list) {
       const err = new Error('Board not found');
       err.status = 404;
@@ -210,9 +218,9 @@ router.post('/:boardId/lists', (req, res, next) => {
   }
 });
 
-router.patch('/:boardId/lists/:listId', (req, res, next) => {
+router.patch('/:boardId/lists/:listId', async (req, res, next) => {
   try {
-    const list = store.updateList(req.params.boardId, req.params.listId, req.body);
+    const list = await store.updateList(req.params.boardId, req.params.listId, req.body);
     if (!list) {
       const err = new Error('List not found');
       err.status = 404;
@@ -224,9 +232,9 @@ router.patch('/:boardId/lists/:listId', (req, res, next) => {
   }
 });
 
-router.delete('/:boardId/lists/:listId', (req, res, next) => {
+router.delete('/:boardId/lists/:listId', async (req, res, next) => {
   try {
-    const list = store.removeList(req.params.boardId, req.params.listId);
+    const list = await store.removeList(req.params.boardId, req.params.listId);
     if (!list) {
       const err = new Error('List not found');
       err.status = 404;
@@ -238,10 +246,10 @@ router.delete('/:boardId/lists/:listId', (req, res, next) => {
   }
 });
 
-router.post('/:boardId/lists/reorder', (req, res, next) => {
+router.post('/:boardId/lists/reorder', async (req, res, next) => {
   try {
     const { listIds } = req.body;
-    const lists = store.reorderLists(req.params.boardId, listIds);
+    const lists = await store.reorderLists(req.params.boardId, listIds);
     if (!lists) {
       const err = new Error('Board not found');
       err.status = 404;
@@ -254,9 +262,9 @@ router.post('/:boardId/lists/reorder', (req, res, next) => {
 });
 
 // Card routes
-router.post('/:boardId/lists/:listId/cards', (req, res, next) => {
+router.post('/:boardId/lists/:listId/cards', async (req, res, next) => {
   try {
-    const card = store.createCard(req.params.boardId, req.params.listId, req.body);
+    const card = await store.createCard(req.params.boardId, req.params.listId, req.body);
     if (!card) {
       const err = new Error('List not found');
       err.status = 404;
@@ -268,9 +276,9 @@ router.post('/:boardId/lists/:listId/cards', (req, res, next) => {
   }
 });
 
-router.patch('/:boardId/cards/:cardId', (req, res, next) => {
+router.patch('/:boardId/cards/:cardId', async (req, res, next) => {
   try {
-    const card = store.updateCard(req.params.boardId, req.params.cardId, req.body);
+    const card = await store.updateCard(req.params.boardId, req.params.cardId, req.body);
     if (!card) {
       const err = new Error('Card not found');
       err.status = 404;
@@ -282,9 +290,9 @@ router.patch('/:boardId/cards/:cardId', (req, res, next) => {
   }
 });
 
-router.delete('/:boardId/cards/:cardId', (req, res, next) => {
+router.delete('/:boardId/cards/:cardId', async (req, res, next) => {
   try {
-    const card = store.removeCard(req.params.boardId, req.params.cardId);
+    const card = await store.removeCard(req.params.boardId, req.params.cardId);
     if (!card) {
       const err = new Error('Card not found');
       err.status = 404;
@@ -296,10 +304,10 @@ router.delete('/:boardId/cards/:cardId', (req, res, next) => {
   }
 });
 
-router.post('/:boardId/cards/:cardId/move', (req, res, next) => {
+router.post('/:boardId/cards/:cardId/move', async (req, res, next) => {
   try {
     const { targetListId, position } = req.body ?? {};
-    const card = store.moveCard(req.params.boardId, req.params.cardId, targetListId, position);
+    const card = await store.moveCard(req.params.boardId, req.params.cardId, targetListId, position);
     if (!card) {
       const err = new Error('Move failed');
       err.status = 404;
@@ -311,10 +319,10 @@ router.post('/:boardId/cards/:cardId/move', (req, res, next) => {
   }
 });
 
-router.post('/:boardId/lists/:listId/cards/reorder', (req, res, next) => {
+router.post('/:boardId/lists/:listId/cards/reorder', async (req, res, next) => {
   try {
     const { cardIds } = req.body;
-    const cards = store.reorderCards(req.params.boardId, req.params.listId, cardIds);
+    const cards = await store.reorderCards(req.params.boardId, req.params.listId, cardIds);
     if (!cards) {
       const err = new Error('List not found');
       err.status = 404;
@@ -327,9 +335,9 @@ router.post('/:boardId/lists/:listId/cards/reorder', (req, res, next) => {
 });
 
 // Checklist routes
-router.post('/:boardId/cards/:cardId/checklists', (req, res, next) => {
+router.post('/:boardId/cards/:cardId/checklists', async (req, res, next) => {
   try {
-    const checklist = store.addChecklist(req.params.boardId, req.params.cardId, req.body);
+    const checklist = await store.addChecklist(req.params.boardId, req.params.cardId, req.body);
     if (!checklist) {
       const err = new Error('Card not found');
       err.status = 404;
@@ -341,9 +349,9 @@ router.post('/:boardId/cards/:cardId/checklists', (req, res, next) => {
   }
 });
 
-router.patch('/:boardId/cards/:cardId/checklists/:checklistId', (req, res, next) => {
+router.patch('/:boardId/cards/:cardId/checklists/:checklistId', async (req, res, next) => {
   try {
-    const checklist = store.updateChecklist(
+    const checklist = await store.updateChecklist(
       req.params.boardId,
       req.params.cardId,
       req.params.checklistId,
@@ -360,9 +368,9 @@ router.patch('/:boardId/cards/:cardId/checklists/:checklistId', (req, res, next)
   }
 });
 
-router.delete('/:boardId/cards/:cardId/checklists/:checklistId', (req, res, next) => {
+router.delete('/:boardId/cards/:cardId/checklists/:checklistId', async (req, res, next) => {
   try {
-    const checklist = store.removeChecklist(
+    const checklist = await store.removeChecklist(
       req.params.boardId,
       req.params.cardId,
       req.params.checklistId
@@ -379,9 +387,9 @@ router.delete('/:boardId/cards/:cardId/checklists/:checklistId', (req, res, next
 });
 
 // Comment routes
-router.post('/:boardId/cards/:cardId/comments', (req, res, next) => {
+router.post('/:boardId/cards/:cardId/comments', async (req, res, next) => {
   try {
-    const comment = store.addComment(req.params.boardId, req.params.cardId, req.body);
+    const comment = await store.addComment(req.params.boardId, req.params.cardId, req.body);
     if (!comment) {
       const err = new Error('Card not found');
       err.status = 404;
@@ -393,9 +401,9 @@ router.post('/:boardId/cards/:cardId/comments', (req, res, next) => {
   }
 });
 
-router.patch('/:boardId/cards/:cardId/comments/:commentId', (req, res, next) => {
+router.patch('/:boardId/cards/:cardId/comments/:commentId', async (req, res, next) => {
   try {
-    const comment = store.updateComment(
+    const comment = await store.updateComment(
       req.params.boardId,
       req.params.cardId,
       req.params.commentId,
@@ -412,9 +420,9 @@ router.patch('/:boardId/cards/:cardId/comments/:commentId', (req, res, next) => 
   }
 });
 
-router.delete('/:boardId/cards/:cardId/comments/:commentId', (req, res, next) => {
+router.delete('/:boardId/cards/:cardId/comments/:commentId', async (req, res, next) => {
   try {
-    const comment = store.removeComment(
+    const comment = await store.removeComment(
       req.params.boardId,
       req.params.cardId,
       req.params.commentId

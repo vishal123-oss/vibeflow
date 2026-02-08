@@ -1,0 +1,131 @@
+[
+  {
+    "id": "vibe-101",
+    "content": {
+      "title": "Setup API",
+      "body": "Initialize express server with middleware"
+    },
+    "meta": {
+      "assignee": "User1",
+      "labels": [
+        "backend",
+        "urgent"
+      ],
+      "priority": "high",
+      "dueDate": "2026-02-01T00:00:00.000Z"
+    },
+    "history": [
+      {
+        "action": "created",
+        "timestamp": "2026-01-25T10:00:00.000Z"
+      }
+    ],
+    "checklists": [
+      {
+        "id": "check-1",
+        "title": "Install dependencies",
+        "items": [
+          {
+            "id": "item-1",
+            "text": "npm install express",
+            "completed": true
+          },
+          {
+            "id": "item-2",
+            "text": "npm install cors",
+            "completed": false
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "vibe-102",
+    "content": {
+      "title": "Add Theme Engine",
+      "body": "Create theme.css with design tokens"
+    },
+    "meta": {
+      "assignee": "User2",
+      "labels": [
+        "frontend",
+        "design"
+      ],
+      "priority": "medium",
+      "dueDate": "2026-01-30T00:00:00.000Z"
+    },
+    "history": [
+      {
+        "action": "created",
+        "timestamp": "2026-01-25T10:05:00.000Z"
+      }
+    ],
+    "checklists": []
+  },
+  {
+    "id": "vibe-103",
+    "content": {
+      "title": "Implement TaskProvider",
+      "body": "Context API with optimistic updates"
+    },
+    "meta": {
+      "assignee": "User1",
+      "labels": [
+        "frontend",
+        "state"
+      ],
+      "priority": "high"
+    },
+    "history": [
+      {
+        "action": "created",
+        "timestamp": "2026-01-25T10:10:00.000Z"
+      }
+    ],
+    "checklists": [
+      {
+        "id": "check-2",
+        "title": "Provider setup",
+        "items": [
+          {
+            "id": "item-3",
+            "text": "Create context",
+            "completed": true
+          },
+          {
+            "id": "item-4",
+            "text": "Add reducer",
+            "completed": true
+          },
+          {
+            "id": "item-5",
+            "text": "Connect components",
+            "completed": false
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "vibe-104",
+    "content": {
+      "title": "Documentation pass",
+      "body": "Update README and API docs"
+    },
+    "meta": {
+      "assignee": "User2",
+      "labels": [
+        "design"
+      ],
+      "priority": "low",
+      "dueDate": "2026-02-05T00:00:00.000Z"
+    },
+    "history": [
+      {
+        "action": "created",
+        "timestamp": "2026-01-25T10:15:00.000Z"
+      }
+    ],
+    "checklists": []
+  }
+]

@@ -1,0 +1,140 @@
+{
+  "id": "board-personal",
+  "title": "Personal Tasks",
+  "description": "My personal todo list and goals.",
+  "background": {
+    "id": "gradient-green",
+    "type": "gradient",
+    "value": "linear-gradient(135deg, #11998e 0%, #38ef7d 100%)"
+  },
+  "starred": false,
+  "archived": false,
+  "createdAt": "2026-01-24T08:00:00.000Z",
+  "labels": [
+    {
+      "id": "p-label-1",
+      "name": "Personal",
+      "color": "#61bd4f"
+    },
+    {
+      "id": "p-label-2",
+      "name": "Work",
+      "color": "#0079bf"
+    },
+    {
+      "id": "p-label-3",
+      "name": "Health",
+      "color": "#ff78cb"
+    }
+  ],
+  "members": [
+    {
+      "id": "user-1",
+      "name": "Alice Chen",
+      "avatar": null,
+      "initials": "AC"
+    }
+  ],
+  "lists": [
+    {
+      "id": "p-list-todo",
+      "title": "To Do",
+      "position": 0,
+      "archived": false,
+      "createdAt": "2026-01-24T08:01:00.000Z",
+      "cards": [
+        {
+          "id": "p-card-1",
+          "position": 0,
+          "archived": false,
+          "content": {
+            "title": "Grocery shopping",
+            "body": "Weekly groceries and household items."
+          },
+          "cover": null,
+          "labels": [
+            "p-label-1"
+          ],
+          "members": [
+            "user-1"
+          ],
+          "dueDate": "2026-01-27",
+          "dueComplete": false,
+          "checklists": [
+            {
+              "id": "p-check-1",
+              "title": "Shopping list",
+              "items": [
+                {
+                  "id": "p-item-1",
+                  "text": "Milk",
+                  "completed": false
+                },
+                {
+                  "id": "p-item-2",
+                  "text": "Bread",
+                  "completed": false
+                },
+                {
+                  "id": "p-item-3",
+                  "text": "Eggs",
+                  "completed": false
+                },
+                {
+                  "id": "p-item-4",
+                  "text": "Vegetables",
+                  "completed": false
+                }
+              ]
+            }
+          ],
+          "comments": [
+            {
+              "id": "comment-mle1vknb-arni",
+              "author": "user-1",
+              "text": "dsdc",
+              "createdAt": "2026-02-08T18:01:58.343Z"
+            },
+            {
+              "id": "comment-mle258kv-ueqd",
+              "author": "user-mle1u588-jkas",
+              "text": "hello",
+              "createdAt": "2026-02-08T18:09:29.263Z"
+            }
+          ],
+          "attachments": [],
+          "activity": [
+            {
+              "action": "created",
+              "user": "user-1",
+              "timestamp": "2026-01-24T08:02:00.000Z"
+            },
+            {
+              "action": "added comment",
+              "user": "user-1",
+              "timestamp": "2026-02-08T18:01:58.343Z"
+            },
+            {
+              "action": "added comment",
+              "user": "user-mle1u588-jkas",
+              "timestamp": "2026-02-08T18:09:29.263Z"
+            },
+            {
+              "action": "updated",
+              "user": "user",
+              "timestamp": "2026-02-08T18:10:08.582Z"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "p-list-done",
+      "title": "Completed",
+      "position": 1,
+      "archived": false,
+      "createdAt": "2026-01-24T08:02:00.000Z",
+      "cards": []
+    }
+  ]
+}

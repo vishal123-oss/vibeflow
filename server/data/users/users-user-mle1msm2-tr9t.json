@@ -1,0 +1,16 @@
+{
+  "id": "user-mle1msm2-tr9t",
+  "email": "user@example.com",
+  "hashedPassword": "$2b$10$96uZWKxbwFpxHhZSzc7T9ugbHiNLFBep7pIngK13JYtQZbXB2Iopy",
+  "password": "your-password",
+  "firstName": "John",
+  "lastName": "Doe",
+  "avatar": null,
+  "initials": "JD",
+  "role": "user",
+  "address": "",
+  "bio": "",
+  "createdAt": "2026-02-08T17:55:08.762Z",
+  "updatedAt": "2026-02-08T17:55:08.762Z",
+  "inactive": false
+}

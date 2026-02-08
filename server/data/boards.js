@@ -1,433 +1,26 @@
 /**
- * In-memory board store with full Trello-like schema.
- * Includes: lists, cards, checklists, comments, labels, covers, archive.
+ * FS-backed board store (per-board files in boards/ folder).
+ * Uses storage utils for schema compliance.
  */
+
+import { getRecord, saveRecord, deleteRecord, listRecords, getAllRecords, readJson } from '../storage/storage.js';
+import path from 'path';
 
 const now = () => new Date().toISOString();
 const id = (prefix) => `${prefix}-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 6)}`;
 
-// Predefined label colors
-const LABEL_COLORS = [
-  { id: 'green', color: '#61bd4f', name: 'Green' },
-  { id: 'yellow', color: '#f2d600', name: 'Yellow' },
-  { id: 'orange', color: '#ff9f1a', name: 'Orange' },
-  { id: 'red', color: '#eb5a46', name: 'Red' },
-  { id: 'purple', color: '#c377e0', name: 'Purple' },
-  { id: 'blue', color: '#0079bf', name: 'Blue' },
-  { id: 'sky', color: '#00c2e0', name: 'Sky' },
-  { id: 'lime', color: '#51e898', name: 'Lime' },
-  { id: 'pink', color: '#ff78cb', name: 'Pink' },
-  { id: 'black', color: '#344563', name: 'Black' },
-];
+// Load static dummy from entity storage (no hardcodes in store)
+async function loadLabelColors() {
+  const { DATA_ROOT } = await import('../storage/storage.js');
+  return readJson(path.join(DATA_ROOT, 'labels/colors.json')) || [];
+}
 
-// Board background options
-const BOARD_BACKGROUNDS = [
-  { id: 'gradient-purple', type: 'gradient', value: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)' },
-  { id: 'gradient-blue', type: 'gradient', value: 'linear-gradient(135deg, #0093E9 0%, #80D0C7 100%)' },
-  { id: 'gradient-green', type: 'gradient', value: 'linear-gradient(135deg, #11998e 0%, #38ef7d 100%)' },
-  { id: 'gradient-orange', type: 'gradient', value: 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)' },
-  { id: 'gradient-dark', type: 'gradient', value: 'linear-gradient(135deg, #1a1a2e 0%, #16213e 100%)' },
-  { id: 'solid-blue', type: 'solid', value: '#0079bf' },
-  { id: 'solid-green', type: 'solid', value: '#519839' },
-  { id: 'solid-orange', type: 'solid', value: '#d29034' },
-  { id: 'solid-red', type: 'solid', value: '#b04632' },
-  { id: 'solid-purple', type: 'solid', value: '#89609e' },
-];
+async function loadBoardBackgrounds() {
+  const { DATA_ROOT } = await import('../storage/storage.js');
+  return readJson(path.join(DATA_ROOT, 'boards/backgrounds.json')) || [];
+}
 
-const defaultBoards = [
-  {
-    id: 'board-vibe-1',
-    title: 'VibeFlow Launch',
-    description: 'MVP delivery plan for the Trello-like experience.',
-    background: BOARD_BACKGROUNDS[0],
-    starred: true,
-    archived: false,
-    createdAt: '2026-01-25T10:00:00.000Z',
-    labels: [
-      { id: 'label-1', name: 'Bug', color: '#eb5a46' },
-      { id: 'label-2', name: 'Feature', color: '#61bd4f' },
-      { id: 'label-3', name: 'Enhancement', color: '#0079bf' },
-      { id: 'label-4', name: 'Design', color: '#c377e0' },
-      { id: 'label-5', name: 'Urgent', color: '#ff9f1a' },
-      { id: 'label-6', name: 'Backend', color: '#344563' },
-    ],
-    members: [
-      { id: 'user-1', name: 'Alice Chen', avatar: null, initials: 'AC' },
-      { id: 'user-2', name: 'Bob Smith', avatar: null, initials: 'BS' },
-      { id: 'user-3', name: 'Carol Davis', avatar: null, initials: 'CD' },
-    ],
-    lists: [
-      {
-        id: 'list-backlog',
-        title: 'Backlog',
-        position: 0,
-        archived: false,
-        createdAt: '2026-01-25T10:01:00.000Z',
-        cards: [
-          {
-            id: 'card-001',
-            position: 0,
-            archived: false,
-            content: {
-              title: 'User authentication system',
-              body: 'Implement OAuth2 with Google and GitHub providers. Include session management and JWT tokens.',
-            },
-            cover: { type: 'color', value: '#0079bf' },
-            labels: ['label-2', 'label-6'],
-            members: ['user-1'],
-            dueDate: '2026-02-15',
-            dueComplete: false,
-            checklists: [
-              {
-                id: 'check-001',
-                title: 'Implementation tasks',
-                items: [
-                  { id: 'item-001', text: 'Set up OAuth providers', completed: true },
-                  { id: 'item-002', text: 'Create auth middleware', completed: true },
-                  { id: 'item-003', text: 'Build login/signup forms', completed: false },
-                  { id: 'item-004', text: 'Add session management', completed: false },
-                ],
-              },
-            ],
-            comments: [
-              {
-                id: 'comment-001',
-                author: 'user-2',
-                text: 'Should we also support email/password auth?',
-                createdAt: '2026-01-25T11:00:00.000Z',
-              },
-              {
-                id: 'comment-002',
-                author: 'user-1',
-                text: 'Yes, adding that to the scope. Will update the checklist.',
-                createdAt: '2026-01-25T11:30:00.000Z',
-              },
-            ],
-            attachments: [],
-            activity: [
-              { action: 'created', user: 'user-1', timestamp: '2026-01-25T10:02:00.000Z' },
-              { action: 'added checklist', user: 'user-1', timestamp: '2026-01-25T10:05:00.000Z' },
-            ],
-          },
-          {
-            id: 'card-002',
-            position: 1,
-            archived: false,
-            content: {
-              title: 'Database schema design',
-              body: 'Design PostgreSQL schema for users, boards, lists, and cards.',
-            },
-            cover: null,
-            labels: ['label-6'],
-            members: ['user-2'],
-            dueDate: null,
-            dueComplete: false,
-            checklists: [],
-            comments: [],
-            attachments: [],
-            activity: [{ action: 'created', user: 'user-2', timestamp: '2026-01-25T10:03:00.000Z' }],
-          },
-        ],
-      },
-      {
-        id: 'list-todo',
-        title: 'To Do',
-        position: 1,
-        archived: false,
-        createdAt: '2026-01-25T10:01:00.000Z',
-        cards: [
-          {
-            id: 'card-101',
-            position: 0,
-            archived: false,
-            content: {
-              title: 'Design system tokens',
-              body: 'Finalize glassmorphism palette, spacing, and typography tokens.',
-            },
-            cover: { type: 'color', value: '#c377e0' },
-            labels: ['label-4', 'label-5'],
-            members: ['user-3'],
-            dueDate: '2026-02-01',
-            dueComplete: false,
-            checklists: [
-              {
-                id: 'check-101',
-                title: 'Design tokens',
-                items: [
-                  { id: 'item-101', text: 'Color palette', completed: true },
-                  { id: 'item-102', text: 'Typography scale', completed: true },
-                  { id: 'item-103', text: 'Spacing system', completed: false },
-                  { id: 'item-104', text: 'Shadow definitions', completed: false },
-                  { id: 'item-105', text: 'Border radius tokens', completed: false },
-                ],
-              },
-            ],
-            comments: [],
-            attachments: [],
-            activity: [{ action: 'created', user: 'user-3', timestamp: '2026-01-25T10:02:00.000Z' }],
-          },
-          {
-            id: 'card-102',
-            position: 1,
-            archived: false,
-            content: {
-              title: 'API scaffolding',
-              body: 'Set up Express endpoints for boards, lists, and cards CRUD operations.',
-            },
-            cover: null,
-            labels: ['label-2', 'label-6'],
-            members: ['user-2'],
-            dueDate: '2026-02-05',
-            dueComplete: false,
-            checklists: [],
-            comments: [
-              {
-                id: 'comment-102',
-                author: 'user-1',
-                text: 'Remember to add proper error handling and validation.',
-                createdAt: '2026-01-25T12:00:00.000Z',
-              },
-            ],
-            attachments: [],
-            activity: [{ action: 'created', user: 'user-2', timestamp: '2026-01-25T10:03:00.000Z' }],
-          },
-          {
-            id: 'card-103',
-            position: 2,
-            archived: false,
-            content: {
-              title: 'Drag and drop implementation',
-              body: 'Use @dnd-kit to enable card reordering and moving between lists.',
-            },
-            cover: { type: 'color', value: '#61bd4f' },
-            labels: ['label-2'],
-            members: ['user-1'],
-            dueDate: '2026-02-10',
-            dueComplete: false,
-            checklists: [
-              {
-                id: 'check-103',
-                title: 'DnD Features',
-                items: [
-                  { id: 'item-103a', text: 'Card drag within list', completed: false },
-                  { id: 'item-103b', text: 'Card drag between lists', completed: false },
-                  { id: 'item-103c', text: 'List reordering', completed: false },
-                  { id: 'item-103d', text: 'Touch support', completed: false },
-                ],
-              },
-            ],
-            comments: [],
-            attachments: [],
-            activity: [{ action: 'created', user: 'user-1', timestamp: '2026-01-25T10:04:00.000Z' }],
-          },
-        ],
-      },
-      {
-        id: 'list-doing',
-        title: 'In Progress',
-        position: 2,
-        archived: false,
-        createdAt: '2026-01-25T10:04:00.000Z',
-        cards: [
-          {
-            id: 'card-201',
-            position: 0,
-            archived: false,
-            content: {
-              title: 'Board UI components',
-              body: 'Build columns, cards, and card detail drawer with glassmorphism styling.',
-            },
-            cover: { type: 'gradient', value: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)' },
-            labels: ['label-2', 'label-4'],
-            members: ['user-1', 'user-3'],
-            dueDate: '2026-02-03',
-            dueComplete: false,
-            checklists: [
-              {
-                id: 'check-201',
-                title: 'UI Components',
-                items: [
-                  { id: 'item-201a', text: 'ListColumn component', completed: true },
-                  { id: 'item-201b', text: 'CardItem component', completed: true },
-                  { id: 'item-201c', text: 'CardModal component', completed: true },
-                  { id: 'item-201d', text: 'AddCardForm', completed: true },
-                  { id: 'item-201e', text: 'AddListForm', completed: true },
-                  { id: 'item-201f', text: 'Checklist UI', completed: false },
-                  { id: 'item-201g', text: 'Comments UI', completed: false },
-                ],
-              },
-            ],
-            comments: [
-              {
-                id: 'comment-201',
-                author: 'user-3',
-                text: 'The glassmorphism effect looks great! Just need to adjust the blur on mobile.',
-                createdAt: '2026-01-25T14:00:00.000Z',
-              },
-            ],
-            attachments: [],
-            activity: [
-              { action: 'created', user: 'user-1', timestamp: '2026-01-25T10:05:00.000Z' },
-              { action: 'moved to In Progress', user: 'user-1', timestamp: '2026-01-25T12:00:00.000Z' },
-            ],
-          },
-        ],
-      },
-      {
-        id: 'list-review',
-        title: 'Review',
-        position: 3,
-        archived: false,
-        createdAt: '2026-01-25T10:05:00.000Z',
-        cards: [
-          {
-            id: 'card-301',
-            position: 0,
-            archived: false,
-            content: {
-              title: 'Project setup and configuration',
-              body: 'Vite + React client, Express server, folder structure, and dev tooling.',
-            },
-            cover: null,
-            labels: ['label-3'],
-            members: ['user-2'],
-            dueDate: null,
-            dueComplete: true,
-            checklists: [
-              {
-                id: 'check-301',
-                title: 'Setup tasks',
-                items: [
-                  { id: 'item-301a', text: 'Initialize Vite project', completed: true },
-                  { id: 'item-301b', text: 'Set up Express server', completed: true },
-                  { id: 'item-301c', text: 'Configure proxy', completed: true },
-                  { id: 'item-301d', text: 'Add ESLint/Prettier', completed: true },
-                ],
-              },
-            ],
-            comments: [],
-            attachments: [],
-            activity: [
-              { action: 'created', user: 'user-2', timestamp: '2026-01-25T10:06:00.000Z' },
-              { action: 'moved to Review', user: 'user-2', timestamp: '2026-01-25T15:00:00.000Z' },
-            ],
-          },
-        ],
-      },
-      {
-        id: 'list-done',
-        title: 'Done',
-        position: 4,
-        archived: false,
-        createdAt: '2026-01-25T10:06:00.000Z',
-        cards: [
-          {
-            id: 'card-401',
-            position: 0,
-            archived: false,
-            content: {
-              title: 'Project kickoff meeting',
-              body: 'Align team on deliverables, timeline, and responsibilities.',
-            },
-            cover: { type: 'color', value: '#61bd4f' },
-            labels: [],
-            members: ['user-1', 'user-2', 'user-3'],
-            dueDate: '2026-01-25',
-            dueComplete: true,
-            checklists: [
-              {
-                id: 'check-401',
-                title: 'Meeting agenda',
-                items: [
-                  { id: 'item-401a', text: 'Review project scope', completed: true },
-                  { id: 'item-401b', text: 'Assign initial tasks', completed: true },
-                  { id: 'item-401c', text: 'Set up communication channels', completed: true },
-                ],
-              },
-            ],
-            comments: [
-              {
-                id: 'comment-401',
-                author: 'user-1',
-                text: 'Great kickoff! Everyone is aligned and ready to go.',
-                createdAt: '2026-01-25T17:00:00.000Z',
-              },
-            ],
-            attachments: [],
-            activity: [
-              { action: 'created', user: 'user-1', timestamp: '2026-01-25T10:07:00.000Z' },
-              { action: 'completed', user: 'user-1', timestamp: '2026-01-25T17:00:00.000Z' },
-            ],
-          },
-        ],
-      },
-    ],
-  },
-  {
-    id: 'board-personal',
-    title: 'Personal Tasks',
-    description: 'My personal todo list and goals.',
-    background: BOARD_BACKGROUNDS[2],
-    starred: false,
-    archived: false,
-    createdAt: '2026-01-24T08:00:00.000Z',
-    labels: [
-      { id: 'p-label-1', name: 'Personal', color: '#61bd4f' },
-      { id: 'p-label-2', name: 'Work', color: '#0079bf' },
-      { id: 'p-label-3', name: 'Health', color: '#ff78cb' },
-    ],
-    members: [{ id: 'user-1', name: 'Alice Chen', avatar: null, initials: 'AC' }],
-    lists: [
-      {
-        id: 'p-list-todo',
-        title: 'To Do',
-        position: 0,
-        archived: false,
-        createdAt: '2026-01-24T08:01:00.000Z',
-        cards: [
-          {
-            id: 'p-card-1',
-            position: 0,
-            archived: false,
-            content: { title: 'Grocery shopping', body: 'Weekly groceries and household items.' },
-            cover: null,
-            labels: ['p-label-1'],
-            members: [],
-            dueDate: '2026-01-27',
-            dueComplete: false,
-            checklists: [
-              {
-                id: 'p-check-1',
-                title: 'Shopping list',
-                items: [
-                  { id: 'p-item-1', text: 'Milk', completed: false },
-                  { id: 'p-item-2', text: 'Bread', completed: false },
-                  { id: 'p-item-3', text: 'Eggs', completed: false },
-                  { id: 'p-item-4', text: 'Vegetables', completed: false },
-                ],
-              },
-            ],
-            comments: [],
-            attachments: [],
-            activity: [{ action: 'created', user: 'user-1', timestamp: '2026-01-24T08:02:00.000Z' }],
-          },
-        ],
-      },
-      {
-        id: 'p-list-done',
-        title: 'Completed',
-        position: 1,
-        archived: false,
-        createdAt: '2026-01-24T08:02:00.000Z',
-        cards: [],
-      },
-    ],
-  },
-];
-
-let boards = JSON.parse(JSON.stringify(defaultBoards));
-
-// Helper functions
+// Helper functions (FS-based; load/save full board)
 const addActivity = (card, action, user = 'system') => ({
   ...card,
   activity: [...(card.activity || []), { action, user, timestamp: now() }],
@@ -441,8 +34,21 @@ const findCard = (board, cardId) => {
   return { card: null, list: null };
 };
 
-// Board operations
-export function getBoards(includeArchived = false) {
+async function loadBoard(boardId) {
+  return getRecord('boards', boardId);
+}
+
+async function saveBoard(board) {
+  return saveRecord('boards', board);
+}
+
+async function loadAllBoards() {
+  return getAllRecords('boards');
+}
+
+// Board operations (now FS-backed; async)
+export async function getBoards(includeArchived = false) {
+  const boards = await loadAllBoards();
   return boards
     .filter((b) => includeArchived || !b.archived)
     .map((b) => ({
@@ -458,8 +64,8 @@ export function getBoards(includeArchived = false) {
     }));
 }
 
-export function getBoard(boardId, includeArchived = false) {
-  const board = boards.find((b) => b.id === boardId);
+export async function getBoard(boardId, includeArchived = false) {
+  const board = await loadBoard(boardId);
   if (!board) return null;
   if (!includeArchived) {
     return {
@@ -476,12 +82,13 @@ export function getBoard(boardId, includeArchived = false) {
   return board;
 }
 
-export function createBoard(payload) {
+export async function createBoard(payload) {
+  const backgrounds = await loadBoardBackgrounds();
   const board = {
     id: payload.id ?? id('board'),
     title: payload.title ?? 'Untitled Board',
     description: payload.description ?? '',
-    background: payload.background ?? BOARD_BACKGROUNDS[4],
+    background: payload.background ?? backgrounds[4],
     starred: payload.starred ?? false,
     archived: false,
     createdAt: now(),
@@ -493,12 +100,11 @@ export function createBoard(payload) {
     members: payload.members ?? [],
     lists: payload.lists ?? [],
   };
-  boards.push(board);
-  return board;
+  return saveBoard(board);
 }
 
-export function updateBoard(boardId, payload) {
-  const board = boards.find((b) => b.id === boardId);
+export async function updateBoard(boardId, payload) {
+  let board = await loadBoard(boardId);
   if (!board) return null;
   if (payload.title !== undefined) board.title = payload.title;
   if (payload.description !== undefined) board.description = payload.description;
@@ -507,19 +113,19 @@ export function updateBoard(boardId, payload) {
   if (payload.archived !== undefined) board.archived = payload.archived;
   if (payload.labels !== undefined) board.labels = payload.labels;
   if (payload.members !== undefined) board.members = payload.members;
-  return board;
+  return saveBoard(board);
 }
 
-export function removeBoard(boardId) {
-  const idx = boards.findIndex((b) => b.id === boardId);
-  if (idx === -1) return null;
-  const [removed] = boards.splice(idx, 1);
+export async function removeBoard(boardId) {
+  const removed = await loadBoard(boardId);
+  if (!removed) return null;
+  await deleteRecord('boards', boardId);
   return removed;
 }
 
-// List operations
-export function createList(boardId, payload) {
-  const board = boards.find((b) => b.id === boardId);
+// List operations (async FS)
+export async function createList(boardId, payload) {
+  let board = await loadBoard(boardId);
   if (!board) return null;
   const maxPosition = Math.max(-1, ...board.lists.map((l) => l.position));
   const list = {
@@ -531,42 +137,46 @@ export function createList(boardId, payload) {
     cards: [],
   };
   board.lists.push(list);
+  await saveBoard(board);
   return list;
 }
 
-export function updateList(boardId, listId, payload) {
-  const board = boards.find((b) => b.id === boardId);
+export async function updateList(boardId, listId, payload) {
+  let board = await loadBoard(boardId);
   if (!board) return null;
   const list = board.lists.find((l) => l.id === listId);
   if (!list) return null;
   if (payload.title !== undefined) list.title = payload.title;
   if (payload.position !== undefined) list.position = payload.position;
   if (payload.archived !== undefined) list.archived = payload.archived;
+  await saveBoard(board);
   return list;
 }
 
-export function removeList(boardId, listId) {
-  const board = boards.find((b) => b.id === boardId);
+export async function removeList(boardId, listId) {
+  let board = await loadBoard(boardId);
   if (!board) return null;
   const idx = board.lists.findIndex((l) => l.id === listId);
   if (idx === -1) return null;
   const [removed] = board.lists.splice(idx, 1);
+  await saveBoard(board);
   return removed;
 }
 
-export function reorderLists(boardId, listIds) {
-  const board = boards.find((b) => b.id === boardId);
+export async function reorderLists(boardId, listIds) {
+  let board = await loadBoard(boardId);
   if (!board) return null;
   listIds.forEach((listId, index) => {
     const list = board.lists.find((l) => l.id === listId);
     if (list) list.position = index;
   });
+  await saveBoard(board);
   return board.lists.sort((a, b) => a.position - b.position);
 }
 
-// Card operations
-export function createCard(boardId, listId, payload) {
-  const board = boards.find((b) => b.id === boardId);
+// Card operations (async FS; load/save board after mutate)
+export async function createCard(boardId, listId, payload) {
+  let board = await loadBoard(boardId);
   if (!board) return null;
   const list = board.lists.find((l) => l.id === listId);
   if (!list) return null;
@@ -587,13 +197,14 @@ export function createCard(boardId, listId, payload) {
     activity: [{ action: 'created', user: 'user', timestamp: now() }],
   };
   list.cards.push(card);
+  await saveBoard(board);
   return card;
 }
 
-export function updateCard(boardId, cardId, payload) {
-  const board = boards.find((b) => b.id === boardId);
+export async function updateCard(boardId, cardId, payload) {
+  let board = await loadBoard(boardId);
   if (!board) return null;
-  const { card, list } = findCard(board, cardId);
+  const { card } = findCard(board, cardId);
   if (!card) return null;
 
   // Update card fields
@@ -612,24 +223,26 @@ export function updateCard(boardId, cardId, payload) {
   // Add activity
   card.activity = [...(card.activity || []), { action: 'updated', user: 'user', timestamp: now() }];
 
+  await saveBoard(board);
   return card;
 }
 
-export function removeCard(boardId, cardId) {
-  const board = boards.find((b) => b.id === boardId);
+export async function removeCard(boardId, cardId) {
+  let board = await loadBoard(boardId);
   if (!board) return null;
   for (const list of board.lists) {
     const idx = list.cards.findIndex((c) => c.id === cardId);
     if (idx !== -1) {
       const [removed] = list.cards.splice(idx, 1);
+      await saveBoard(board);
       return removed;
     }
   }
   return null;
 }
 
-export function moveCard(boardId, cardId, targetListId, position) {
-  const board = boards.find((b) => b.id === boardId);
+export async function moveCard(boardId, cardId, targetListId, position) {
+  let board = await loadBoard(boardId);
   if (!board) return null;
 
   // Find and remove card from current list
@@ -650,6 +263,7 @@ export function moveCard(boardId, cardId, targetListId, position) {
   if (!targetList) {
     // Restore card if target not found
     sourceList.cards.push(movedCard);
+    await saveBoard(board);
     return null;
   }
 
@@ -673,11 +287,12 @@ export function moveCard(boardId, cardId, targetListId, position) {
   targetList.cards.push(movedCard);
   targetList.cards.sort((a, b) => a.position - b.position);
 
+  await saveBoard(board);
   return movedCard;
 }
 
-export function reorderCards(boardId, listId, cardIds) {
-  const board = boards.find((b) => b.id === boardId);
+export async function reorderCards(boardId, listId, cardIds) {
+  let board = await loadBoard(boardId);
   if (!board) return null;
   const list = board.lists.find((l) => l.id === listId);
   if (!list) return null;
@@ -686,12 +301,13 @@ export function reorderCards(boardId, listId, cardIds) {
     if (card) card.position = index;
   });
   list.cards.sort((a, b) => a.position - b.position);
+  await saveBoard(board);
   return list.cards;
 }
 
-// Checklist operations
-export function addChecklist(boardId, cardId, payload) {
-  const board = boards.find((b) => b.id === boardId);
+// Checklist operations (async FS)
+export async function addChecklist(boardId, cardId, payload) {
+  let board = await loadBoard(boardId);
   if (!board) return null;
   const { card } = findCard(board, cardId);
   if (!card) return null;
@@ -703,11 +319,12 @@ export function addChecklist(boardId, cardId, payload) {
   };
   card.checklists.push(checklist);
   card.activity.push({ action: 'added checklist', user: 'user', timestamp: now() });
+  await saveBoard(board);
   return checklist;
 }
 
-export function updateChecklist(boardId, cardId, checklistId, payload) {
-  const board = boards.find((b) => b.id === boardId);
+export async function updateChecklist(boardId, cardId, checklistId, payload) {
+  let board = await loadBoard(boardId);
   if (!board) return null;
   const { card } = findCard(board, cardId);
   if (!card) return null;
@@ -716,11 +333,12 @@ export function updateChecklist(boardId, cardId, checklistId, payload) {
 
   if (payload.title !== undefined) checklist.title = payload.title;
   if (payload.items !== undefined) checklist.items = payload.items;
+  await saveBoard(board);
   return checklist;
 }
 
-export function removeChecklist(boardId, cardId, checklistId) {
-  const board = boards.find((b) => b.id === boardId);
+export async function removeChecklist(boardId, cardId, checklistId) {
+  let board = await loadBoard(boardId);
   if (!board) return null;
   const { card } = findCard(board, cardId);
   if (!card) return null;
@@ -728,12 +346,13 @@ export function removeChecklist(boardId, cardId, checklistId) {
   if (idx === -1) return null;
   const [removed] = card.checklists.splice(idx, 1);
   card.activity.push({ action: 'removed checklist', user: 'user', timestamp: now() });
+  await saveBoard(board);
   return removed;
 }
 
-// Comment operations
-export function addComment(boardId, cardId, payload) {
-  const board = boards.find((b) => b.id === boardId);
+// Comment operations (async FS)
+export async function addComment(boardId, cardId, payload) {
+  let board = await loadBoard(boardId);
   if (!board) return null;
   const { card } = findCard(board, cardId);
   if (!card) return null;
@@ -746,11 +365,12 @@ export function addComment(boardId, cardId, payload) {
   };
   card.comments.push(comment);
   card.activity.push({ action: 'added comment', user: payload.author, timestamp: now() });
+  await saveBoard(board);
   return comment;
 }
 
-export function updateComment(boardId, cardId, commentId, payload) {
-  const board = boards.find((b) => b.id === boardId);
+export async function updateComment(boardId, cardId, commentId, payload) {
+  let board = await loadBoard(boardId);
   if (!board) return null;
   const { card } = findCard(board, cardId);
   if (!card) return null;
@@ -758,23 +378,25 @@ export function updateComment(boardId, cardId, commentId, payload) {
   if (!comment) return null;
 
   if (payload.text !== undefined) comment.text = payload.text;
+  await saveBoard(board);
   return comment;
 }
 
-export function removeComment(boardId, cardId, commentId) {
-  const board = boards.find((b) => b.id === boardId);
+export async function removeComment(boardId, cardId, commentId) {
+  let board = await loadBoard(boardId);
   if (!board) return null;
   const { card } = findCard(board, cardId);
   if (!card) return null;
   const idx = card.comments.findIndex((c) => c.id === commentId);
   if (idx === -1) return null;
   const [removed] = card.comments.splice(idx, 1);
+  await saveBoard(board);
   return removed;
 }
 
-// Label operations
-export function addBoardLabel(boardId, payload) {
-  const board = boards.find((b) => b.id === boardId);
+// Label operations (async FS)
+export async function addBoardLabel(boardId, payload) {
+  let board = await loadBoard(boardId);
   if (!board) return null;
   const label = {
     id: payload.id ?? id('label'),
@@ -782,21 +404,23 @@ export function addBoardLabel(boardId, payload) {
     color: payload.color ?? '#0079bf',
   };
   board.labels.push(label);
+  await saveBoard(board);
   return label;
 }
 
-export function updateBoardLabel(boardId, labelId, payload) {
-  const board = boards.find((b) => b.id === boardId);
+export async function updateBoardLabel(boardId, labelId, payload) {
+  let board = await loadBoard(boardId);
   if (!board) return null;
   const label = board.labels.find((l) => l.id === labelId);
   if (!label) return null;
   if (payload.name !== undefined) label.name = payload.name;
   if (payload.color !== undefined) label.color = payload.color;
+  await saveBoard(board);
   return label;
 }
 
-export function removeBoardLabel(boardId, labelId) {
-  const board = boards.find((b) => b.id === boardId);
+export async function removeBoardLabel(boardId, labelId) {
+  let board = await loadBoard(boardId);
   if (!board) return null;
   const idx = board.labels.findIndex((l) => l.id === labelId);
   if (idx === -1) return null;
@@ -807,12 +431,13 @@ export function removeBoardLabel(boardId, labelId) {
       card.labels = card.labels.filter((l) => l !== labelId);
     });
   });
+  await saveBoard(board);
   return removed;
 }
 
-// Archive operations
-export function getArchivedCards(boardId) {
-  const board = boards.find((b) => b.id === boardId);
+// Archive operations (async FS)
+export async function getArchivedCards(boardId) {
+  const board = await loadBoard(boardId);
   if (!board) return null;
   const archived = [];
   board.lists.forEach((list) => {
@@ -823,34 +448,36 @@ export function getArchivedCards(boardId) {
   return archived;
 }
 
-export function getArchivedLists(boardId) {
-  const board = boards.find((b) => b.id === boardId);
+export async function getArchivedLists(boardId) {
+  const board = await loadBoard(boardId);
   if (!board) return null;
   return board.lists.filter((l) => l.archived);
 }
 
-export function restoreCard(boardId, cardId) {
-  const board = boards.find((b) => b.id === boardId);
+export async function restoreCard(boardId, cardId) {
+  let board = await loadBoard(boardId);
   if (!board) return null;
   const { card } = findCard(board, cardId);
   if (!card) return null;
   card.archived = false;
   card.activity.push({ action: 'restored from archive', user: 'user', timestamp: now() });
+  await saveBoard(board);
   return card;
 }
 
-export function restoreList(boardId, listId) {
-  const board = boards.find((b) => b.id === boardId);
+export async function restoreList(boardId, listId) {
+  let board = await loadBoard(boardId);
   if (!board) return null;
   const list = board.lists.find((l) => l.id === listId);
   if (!list) return null;
   list.archived = false;
+  await saveBoard(board);
   return list;
 }
 
-// Search
-export function searchCards(boardId, query) {
-  const board = boards.find((b) => b.id === boardId);
+// Search (async FS)
+export async function searchCards(boardId, query) {
+  const board = await loadBoard(boardId);
   if (!board) return [];
   const q = query.toLowerCase();
   const results = [];
@@ -868,17 +495,20 @@ export function searchCards(boardId, query) {
   return results;
 }
 
-// Static data
-export function getLabelColors() {
-  return LABEL_COLORS;
+// Static data (load from entity storage files)
+export async function getLabelColors() {
+  return loadLabelColors();
 }
 
-export function getBoardBackgrounds() {
-  return BOARD_BACKGROUNDS;
+export async function getBoardBackgrounds() {
+  return loadBoardBackgrounds();
 }
 
-// Reset
-export function resetBoards() {
-  boards = JSON.parse(JSON.stringify(defaultBoards));
-  return boards;
+// Reset (FS re-init; dummy boards in entity files)
+export async function resetBoards() {
+  const boards = await listRecords('boards');
+  for (const bid of boards) {
+    await deleteRecord('boards', bid);
+  }
+  return [];
 }

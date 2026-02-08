@@ -1,19 +1,23 @@
 import express from 'express';
 import cors from 'cors';
+import cookieParser from 'cookie-parser';
 import { requestLogger } from './middleware/requestLogger.js';
 import { errorHandler } from './middleware/errorHandler.js';
 import tasksRouter from './routes/tasks.js';
 import boardsRouter from './routes/boards.js';
+import authRouter from './routes/auth.js';
 
 const app = express();
 const PORT = process.env.PORT ?? 4000;
 
 app.use(cors());
 app.use(express.json());
+app.use(cookieParser());
 app.use(requestLogger);
 
 app.use('/api/tasks', tasksRouter);
 app.use('/api/boards', boardsRouter);
+app.use('/api/auth', authRouter);
 
 app.use((req, res, next) => {
   const err = new Error('Not Found');

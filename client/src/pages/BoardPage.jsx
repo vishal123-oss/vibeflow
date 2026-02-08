@@ -14,6 +14,7 @@ import {
   horizontalListSortingStrategy,
   sortableKeyboardCoordinates,
 } from '@dnd-kit/sortable';
+import { useAuth } from '../context/AuthContext';
 import { useBoards } from '../context/BoardContext';
 import { SortableList } from '../components/SortableList';
 import { AddListForm } from '../components/AddListForm';
@@ -31,6 +32,7 @@ import styles from './BoardPage.module.css';
 export function BoardPage() {
   const { boardId } = useParams();
   const navigate = useNavigate();
+  const { user, loading: authLoading } = useAuth();
   const {
     activeBoard,
     loading,
@@ -69,6 +71,13 @@ export function BoardPage() {
   const [filterMembers, setFilterMembers] = useState([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [currentView, setCurrentView] = useState('kanban');
+
+  // Protect: redirect unauth to login
+  useEffect(() => {
+    if (!authLoading && !user) {
+      navigate('/login');
+    }
+  }, [user, authLoading, navigate]);
 
   useEffect(() => {
     fetchBoard(boardId);

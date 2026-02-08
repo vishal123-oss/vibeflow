@@ -3,27 +3,27 @@ import * as store from '../data/tasks.js';
 
 const router = Router();
 
-router.post('/reset', (req, res, next) => {
+router.post('/reset', async (req, res, next) => {
   try {
-    const tasks = store.reset();
+    const tasks = await store.reset(); // Note: reset now sync but loads FS
     res.json(tasks);
   } catch (e) {
     next(e);
   }
 });
 
-router.get('/', (req, res, next) => {
+router.get('/', async (req, res, next) => {
   try {
-    const tasks = store.getAll();
+    const tasks = await store.getAll();
     res.json(tasks);
   } catch (e) {
     next(e);
   }
 });
 
-router.get('/:id', (req, res, next) => {
+router.get('/:id', async (req, res, next) => {
   try {
-    const task = store.getById(req.params.id);
+    const task = await store.getById(req.params.id); // Make getById async if needed
     if (!task) {
       const err = new Error('Task not found');
       err.status = 404;
@@ -35,18 +35,18 @@ router.get('/:id', (req, res, next) => {
   }
 });
 
-router.post('/', (req, res, next) => {
+router.post('/', async (req, res, next) => {
   try {
-    const task = store.create(req.body);
+    const task = await store.create(req.body); // Assume updated
     res.status(201).json(task);
   } catch (e) {
     next(e);
   }
 });
 
-router.patch('/:id', (req, res, next) => {
+router.patch('/:id', async (req, res, next) => {
   try {
-    const task = store.update(req.params.id, req.body);
+    const task = await store.update(req.params.id, req.body);
     if (!task) {
       const err = new Error('Task not found');
       err.status = 404;
@@ -58,9 +58,9 @@ router.patch('/:id', (req, res, next) => {
   }
 });
 
-router.delete('/:id', (req, res, next) => {
+router.delete('/:id', async (req, res, next) => {
   try {
-    const task = store.remove(req.params.id);
+    const task = await store.remove(req.params.id);
     if (!task) {
       const err = new Error('Task not found');
       err.status = 404;

@@ -53,7 +53,9 @@ export function ActivitySection({ activity, boardMembers }) {
               </div>
               <div className={styles.content}>
                 <span className={styles.action}>
-                  <strong>{member?.name || item.user || 'System'}</strong>
+                  <strong>
+                    {member?.name || `${member?.firstName || ''} ${member?.lastName || ''}`.trim() || item.user || 'System'}
+                  </strong>
                   {' '}{item.action}
                 </span>
                 <span className={styles.time}>{formatDate(item.timestamp)}</span>
