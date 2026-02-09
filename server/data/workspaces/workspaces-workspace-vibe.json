@@ -1,0 +1,9 @@
+{
+  "id": "workspace-vibe",
+  "name": "VibeFlow Team",
+  "description": "Main workspace for VibeFlow project",
+  "ownerId": "user-1",
+  "members": ["user-1", "user-2"],
+  "createdAt": "2026-01-25T10:00:00.000Z",
+  "updatedAt": "2026-01-25T10:00:00.000Z"
+}

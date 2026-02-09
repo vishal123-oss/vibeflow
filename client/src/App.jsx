@@ -6,6 +6,7 @@ import { Layout } from './components/Layout';
 import { BoardsPage } from './pages/BoardsPage';
 import { BoardPage } from './pages/BoardPage';
 import { TasksPage } from './pages/TasksPage';
+import { WorkspaceSelectPage } from './pages/WorkspaceSelectPage';
 import LoginPage from './pages/LoginPage';
 
 export default function App() {
@@ -16,6 +17,7 @@ export default function App() {
           <BoardProvider>
             <Routes>
               <Route path="/login" element={<LoginPage />} />
+              <Route path="/workspaces" element={<WorkspaceSelectPage />} />
               <Route path="/" element={<Layout />}>
                 <Route index element={<BoardsPage />} />
                 <Route path="tasks" element={<TasksPage />} />

@@ -129,11 +129,19 @@ export function CardItem({ card, boardLabels = [], onOpen, isDragging }) {
 
         {members.length > 0 && (
           <div className={styles.members}>
-            {members.slice(0, 3).map((memberId, i) => (
-              <span key={memberId} className={styles.avatar} title={memberId}>
-                {memberId.slice(0, 2).toUpperCase()}
-              </span>
-            ))}
+            {members.slice(0, 3).map((member, i) => {
+              // Handle string id or object {id, name, initials}
+              const id = typeof member === 'string' ? member : member.id || member;
+              const name = typeof member === 'object' && member.name ? member.name : id;
+              const initials = typeof member === 'object' && member.initials 
+                ? member.initials 
+                : (typeof id === 'string' ? id.slice(0, 2).toUpperCase() : '??');
+              return (
+                <span key={id} className={styles.avatar} title={name}>
+                  {initials}
+                </span>
+              );
+            })}
             {members.length > 3 && (
               <span className={styles.avatarMore}>+{members.length - 3}</span>
             )}

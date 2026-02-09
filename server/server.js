@@ -6,6 +6,7 @@ import { errorHandler } from './middleware/errorHandler.js';
 import { authenticateToken } from './middleware/auth.js';
 import tasksRouter from './routes/tasks.js';
 import boardsRouter from './routes/boards.js';
+import workspacesRouter from './routes/workspaces.js';
 import authRouter from './routes/auth.js';
 import { PORT } from './config.js';
 import { StatusCodes } from './constants.js';
@@ -20,6 +21,7 @@ app.use(requestLogger);
 // Protected routes (require valid JWT)
 app.use('/api/tasks', authenticateToken, tasksRouter);
 app.use('/api/boards', authenticateToken, boardsRouter);
+app.use('/api/workspaces', authenticateToken, workspacesRouter);
 // Auth routes are public
 app.use('/api/auth', authRouter);
 

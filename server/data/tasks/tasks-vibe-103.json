@@ -1,11 +1,12 @@
 {
   "id": "vibe-103",
+  "workspaceId": "workspace-vibe",
   "content": {
     "title": "Implement TaskProvider",
     "body": "Context API with optimistic updates"
   },
   "meta": {
-    "assignee": "User1",
+    "assignee": "user-3",
     "labels": [
       "frontend",
       "state"

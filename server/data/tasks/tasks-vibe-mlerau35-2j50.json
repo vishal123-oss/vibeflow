@@ -1,11 +1,12 @@
 {
   "id": "vibe-mlerau35-2j50",
+  "workspaceId": "workspace-vibe",
   "content": {
     "title": "scdds",
     "body": "scv"
   },
   "meta": {
-    "assignee": "",
+    "assignee": "user-2",
     "labels": [
       "sdc"
     ],

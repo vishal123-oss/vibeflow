@@ -1,0 +1,20 @@
+{
+  "id": "user-mlf325pg-papw",
+  "email": "vsharma@ext.teachx.ai",
+  "hashedPassword": "$2b$10$kV/4nMt3dnW3DLGgcovoDetMqhNqTtsvPCiVMAW8NZS9DCN7pgGe2",
+  "password": "Vishal$123",
+  "firstName": "Vishal",
+  "lastName": "Sharma",
+  "avatar": null,
+  "initials": "VS",
+  "role": "user",
+  "address": "",
+  "bio": "",
+  "workspaces": [
+    "workspace-vibe",
+    "workspace-personal"
+  ],
+  "createdAt": "2026-02-09T11:22:51.364Z",
+  "updatedAt": "2026-02-09T11:22:51.364Z",
+  "inactive": false
+}

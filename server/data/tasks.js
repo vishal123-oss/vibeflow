@@ -28,6 +28,7 @@ export async function getById(id) {
 export async function create(payload) {
   const task = {
     id: payload.id ?? generateId('vibe'),
+    workspaceId: payload.workspaceId,
     content: payload.content ?? { title: '', body: '' },
     meta: payload.meta ?? { assignee: '', labels: [], priority: 'medium' },
     history: [{ action: 'created', timestamp: now() }],
@@ -41,6 +42,7 @@ export async function update(id, payload) {
   const updated = addHistory(
     {
       ...task,
+      ...(payload.workspaceId !== undefined && { workspaceId: payload.workspaceId }),
       content: { ...task.content, ...payload.content },
       meta: { ...task.meta, ...payload.meta },
     },

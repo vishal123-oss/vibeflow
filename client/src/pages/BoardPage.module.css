@@ -2,12 +2,16 @@
   min-height: calc(100vh - 76px);
   display: flex;
   flex-direction: column;
+  background: linear-gradient(145deg, #1e1b4b 0%, #312e81 50%, #4338ca 100%);
+  color: white;
 }
 
 .boardWrapper {
   flex: 1;
   overflow-x: auto;
   padding: var(--space-lg);
+  background: rgba(255, 255, 255, 0.03);
+  backdrop-filter: blur(12px);
 }
 
 .board {
@@ -15,6 +19,7 @@
   gap: var(--space-md);
   align-items: flex-start;
   min-height: 100%;
+  padding-bottom: 2rem;
 }
 
 @media (max-width: 768px) {
@@ -45,20 +50,26 @@
   gap: var(--space-md);
   padding: var(--space-md) var(--space-lg);
   margin: var(--space-md);
-  background: rgba(248, 113, 113, 0.12);
-  border: 1px solid rgba(248, 113, 113, 0.3);
+  background: linear-gradient(90deg, rgba(167, 139, 250, 0.15), rgba(96, 165, 250, 0.15));
+  border: 1px solid rgba(167, 139, 250, 0.4);
   border-radius: var(--radius-md);
-  color: var(--error);
+  color: #e0e7ff;
   font-size: 0.9rem;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
 }
 
 .banner button {
   padding: var(--space-xs) var(--space-sm);
   border: none;
   border-radius: var(--radius-sm);
-  background: rgba(248, 113, 113, 0.2);
+  background: rgba(255, 255, 255, 0.15);
   color: inherit;
   cursor: pointer;
+  transition: background 0.2s;
+}
+
+.banner button:hover {
+  background: rgba(255, 255, 255, 0.25);
 }
 
 .loading {

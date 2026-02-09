@@ -6,5 +6,8 @@
   "avatar": null,
   "initials": "BS",
   "role": "user",
-  "createdAt": "2026-01-25T10:01:00.000Z"
+  "createdAt": "2026-01-25T10:01:00.000Z",
+  "workspaces": [
+    "workspace-vibe"
+  ]
 }

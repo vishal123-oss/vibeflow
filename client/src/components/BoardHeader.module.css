@@ -5,6 +5,8 @@
   padding: var(--space-md) var(--space-lg);
   background: rgba(0, 0, 0, 0.2);
   backdrop-filter: blur(8px);
+  position: relative; /* for contained dropdown positioning */
+  z-index: 10;
 }
 
 .left {
@@ -98,4 +100,104 @@
   font-weight: 600;
   border: 2px solid rgba(0, 0, 0, 0.2);
   margin-left: -8px;
+}
+
+/* Attractive workspace switcher */
+.workspaceSwitcher {
+  position: relative; /* ensures dropdown contained */
+  margin-right: var(--space-sm);
+  z-index: 2000;
+}
+
+.workspaceBtn {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: white;
+  padding: 0.5rem 1rem;
+  border-radius: 9999px;
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  backdrop-filter: blur(10px);
+}
+
+.workspaceBtn:hover {
+  background: rgba(167, 139, 250, 0.2);
+  border-color: #a78bfa;
+  transform: translateY(-1px);
+}
+
+.workspaceIcon {
+  font-size: 1.1rem;
+}
+
+.chevron {
+  font-size: 0.8rem;
+  opacity: 0.7;
+  transition: transform 0.2s;
+}
+
+.workspaceBtn:hover .chevron {
+  transform: rotate(180deg);
+}
+
+.workspaceMenu {
+  position: absolute;
+  top: 110%;
+  right: 0;
+  background: rgba(15, 23, 42, 0.95);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(167, 139, 250, 0.3);
+  border-radius: 16px;
+  padding: 0.5rem;
+  min-width: 240px;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+  z-index: 2000; /* higher to avoid overlap with view tabs/header */
+  overflow: hidden;
+}
+
+.menuBackdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 99;
+  background: transparent;
+}
+
+.menuItem {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  width: 100%;
+  padding: 0.75rem 1rem;
+  background: none;
+  border: none;
+  color: white;
+  text-align: left;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.menuItem:hover,
+.menuItem.active {
+  background: rgba(167, 139, 250, 0.15);
+}
+
+.menuIcon {
+  font-size: 1.25rem;
+  width: 32px;
+}
+
+.menuName {
+  font-weight: 600;
+  font-size: 1rem;
+}
+
+.menuDesc {
+  font-size: 0.85rem;
+  color: #94a3b8;
+  margin-top: 0.1rem;
 }

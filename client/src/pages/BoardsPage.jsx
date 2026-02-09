@@ -4,11 +4,12 @@ import { useBoards } from '../context/BoardContext';
 import styles from './BoardsPage.module.css';
 
 export function BoardsPage() {
-  const { boards, loading, error, fetchBoards, resetBoards, clearError } = useBoards();
+  const { boards, workspaces, loading, error, fetchBoards, fetchWorkspaces, resetBoards, clearError } = useBoards();
 
   useEffect(() => {
     fetchBoards();
-  }, [fetchBoards]);
+    fetchWorkspaces();
+  }, [fetchBoards, fetchWorkspaces]);
 
   return (
     <section className={styles.page}>
@@ -36,15 +37,30 @@ export function BoardsPage() {
       {loading && boards.length === 0 ? (
         <p className={styles.loading}>Loading boards…</p>
       ) : (
-        <div className={styles.grid}>
-          {boards.map((board) => (
-            <Link key={board.id} to={`/boards/${board.id}`} className={styles.card}>
-              <h3>{board.title}</h3>
-              <p>{board.description || 'No description yet.'}</p>
-              <span>Open board →</span>
-            </Link>
-          ))}
-        </div>
+        <>
+          <div className={styles.workspacesSection}>
+            <h3>Workspaces</h3>
+            <div className={styles.workspaceList}>
+              {workspaces.map((ws) => (
+                <div key={ws.id} className={styles.workspaceCard}>
+                  <strong>{ws.name}</strong>
+                  <p>{ws.description || 'No description'}</p>
+                  <small>Members: {ws.members?.length || 0}</small>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <div className={styles.grid}>
+            {boards.map((board) => (
+              <Link key={board.id} to={`/boards/${board.id}`} className={styles.card}>
+                <h3>{board.title}</h3>
+                <p>{board.description || 'No description yet.'}</p>
+                <span>Open board →</span>
+              </Link>
+            ))}
+          </div>
+        </>
       )}
     </section>
   );

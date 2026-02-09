@@ -21,7 +21,7 @@ export default function LoginPage() {
       } else {
         await signup({ ...form, role: 'user' });
       }
-      navigate('/');
+      navigate('/workspaces');
     } catch (err) {
       setError(err.response?.data?.message || err.message || 'Auth failed');
     } finally {

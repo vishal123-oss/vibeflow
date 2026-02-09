@@ -90,6 +90,7 @@ export function AuthProvider({ children }) {
 
   const logout = () => {
     localStorage.removeItem('token');
+    localStorage.removeItem('selectedWorkspaceId');
     setToken(null);
     setUser(null);
     setUsers([]);

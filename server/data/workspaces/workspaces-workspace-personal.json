@@ -1,0 +1,9 @@
+{
+  "id": "workspace-personal",
+  "name": "Personal Workspace",
+  "description": "Private boards and tasks",
+  "ownerId": "user-1",
+  "members": ["user-1"],
+  "createdAt": "2026-01-25T10:00:00.000Z",
+  "updatedAt": "2026-01-25T10:00:00.000Z"
+}

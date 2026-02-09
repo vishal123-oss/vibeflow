@@ -1,0 +1,9 @@
+{
+  "id": "workspace-team",
+  "name": "Engineering Team",
+  "description": "Development and ops workspace",
+  "ownerId": "user-2",
+  "members": ["user-1", "user-2", "user-3"],
+  "createdAt": "2026-01-25T10:00:00.000Z",
+  "updatedAt": "2026-01-25T10:00:00.000Z"
+}

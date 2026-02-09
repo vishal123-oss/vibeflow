@@ -12,5 +12,8 @@
   "bio": "",
   "createdAt": "2026-02-08T17:55:08.762Z",
   "updatedAt": "2026-02-08T17:55:08.762Z",
-  "inactive": false
+  "inactive": false,
+  "workspaces": [
+    "workspace-personal"
+  ]
 }

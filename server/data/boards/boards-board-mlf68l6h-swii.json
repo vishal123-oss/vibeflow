@@ -1,0 +1,33 @@
+{
+  "id": "board-mlf68l6h-swii",
+  "workspaceId": "workspace-vibe",
+  "title": "Tesh",
+  "description": "sdcnsdc",
+  "background": {
+    "id": "gradient-dark",
+    "type": "gradient",
+    "value": "linear-gradient(135deg, #1a1a2e 0%, #16213e 100%)"
+  },
+  "starred": false,
+  "archived": false,
+  "createdAt": "2026-02-09T12:51:50.201Z",
+  "labels": [
+    {
+      "id": "label-mlf68l6h-opz4",
+      "name": "Bug",
+      "color": "#eb5a46"
+    },
+    {
+      "id": "label-mlf68l6h-vl8d",
+      "name": "Feature",
+      "color": "#61bd4f"
+    },
+    {
+      "id": "label-mlf68l6h-9coa",
+      "name": "Enhancement",
+      "color": "#0079bf"
+    }
+  ],
+  "members": [],
+  "lists": []
+}

@@ -33,6 +33,7 @@ export async function createUser(payload) {
     role: payload.role ?? 'user',
     address: payload.address ?? '',
     bio: payload.bio ?? '',
+    workspaces: payload.workspaces ?? [],
     createdAt: now(),
     updatedAt: now(),
     inactive: false

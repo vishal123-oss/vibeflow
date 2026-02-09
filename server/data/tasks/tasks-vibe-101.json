@@ -1,11 +1,12 @@
 {
   "id": "vibe-101",
+  "workspaceId": "workspace-vibe",
   "content": {
     "title": "Setup API",
     "body": "Initialize express server with middleware"
   },
   "meta": {
-    "assignee": "User1",
+    "assignee": "user-2",
     "labels": [
       "backend",
       "urgent"

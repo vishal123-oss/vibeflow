@@ -1,12 +1,16 @@
-import { createContext, useCallback, useContext, useReducer } from 'react';
+import { createContext, useCallback, useContext, useMemo, useReducer } from 'react';
 import axios from 'axios';
 
 const API = '/api/boards';
+const WORKSPACES_API = '/api/workspaces';
 
 const BoardContext = createContext(null);
 
 const initialState = {
-  boards: [],
+  allBoards: [], // raw from server
+  boards: [], // filtered for display
+  workspaces: [],
+  selectedWorkspaceId: localStorage.getItem('selectedWorkspaceId') || null,
   activeBoard: null,
   searchResults: [],
   archivedCards: [],
@@ -23,8 +27,14 @@ function reducer(state, action) {
       return { ...state, loading: true, error: null };
     case 'ERROR':
       return { ...state, loading: false, error: action.payload };
+    case 'SET_ALL_BOARDS':
+      return { ...state, allBoards: action.payload, loading: false, error: null };
     case 'SET_BOARDS':
       return { ...state, boards: action.payload, loading: false, error: null };
+    case 'SET_WORKSPACES':
+      return { ...state, workspaces: action.payload, loading: false, error: null };
+    case 'SET_SELECTED_WORKSPACE':
+      return { ...state, selectedWorkspaceId: action.payload };
     case 'SET_BOARD':
       return { ...state, activeBoard: action.payload, loading: false, error: null };
     case 'SET_SEARCH_RESULTS':
@@ -121,18 +131,36 @@ export function BoardProvider({ children }) {
     }
   }, []);
 
-  // Boards
+  const fetchWorkspaces = useCallback(async () => {
+    try {
+      const { data } = await axios.get(WORKSPACES_API);
+      dispatch({ type: 'SET_WORKSPACES', payload: data });
+      return data;
+    } catch (err) {
+      setError(err, 'Failed to load workspaces');
+      throw err;
+    }
+  }, [setError]);
+
+  // Boards (fetch all raw; filter via memo below for reactivity on ws switch)
   const fetchBoards = useCallback(async () => {
     dispatch({ type: 'LOADING' });
     try {
-      const { data } = await axios.get(API);
-      dispatch({ type: 'SET_BOARDS', payload: data });
-      return data;
+      const { data: allBoards } = await axios.get(API);
+      dispatch({ type: 'SET_ALL_BOARDS', payload: allBoards });
+      return allBoards;
     } catch (err) {
       setError(err, 'Failed to load boards');
       throw err;
     }
   }, [setError]);
+
+  // Select workspace (filters boards client-side for now)
+  const selectWorkspace = useCallback((workspaceId) => {
+    localStorage.setItem('selectedWorkspaceId', workspaceId);
+    dispatch({ type: 'SET_SELECTED_WORKSPACE', payload: workspaceId });
+    fetchBoards(); // refetch + filter
+  }, [fetchBoards]);
 
   const fetchBoard = useCallback(async (boardId) => {
     dispatch({ type: 'LOADING' });
@@ -187,7 +215,7 @@ export function BoardProvider({ children }) {
     dispatch({ type: 'LOADING' });
     try {
       const { data } = await axios.post(`${API}/reset`);
-      dispatch({ type: 'SET_BOARDS', payload: data });
+      dispatch({ type: 'SET_ALL_BOARDS', payload: data });
       dispatch({ type: 'SET_BOARD', payload: null });
       return data;
     } catch (err) {
@@ -488,8 +516,18 @@ export function BoardProvider({ children }) {
 
   const clearError = useCallback(() => dispatch({ type: 'ERROR', payload: null }), []);
 
+  // Reactive filtered boards for workspace switch (fixes update on select)
+  const displayedBoards = useMemo(() => {
+    const selectedId = state.selectedWorkspaceId;
+    return selectedId
+      ? state.allBoards.filter((b) => b.workspaceId === selectedId)
+      : state.allBoards;
+  }, [state.allBoards, state.selectedWorkspaceId]);
+
   const value = {
-    boards: state.boards,
+    boards: displayedBoards, // reactive filtered for ws switch
+    workspaces: state.workspaces,
+    selectedWorkspaceId: state.selectedWorkspaceId,
     activeBoard: state.activeBoard,
     searchResults: state.searchResults,
     archivedCards: state.archivedCards,
@@ -499,6 +537,8 @@ export function BoardProvider({ children }) {
     loading: state.loading,
     error: state.error,
     fetchMeta,
+    fetchWorkspaces,
+    selectWorkspace,
     fetchBoards,
     fetchBoard,
     createBoard,

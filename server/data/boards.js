@@ -60,6 +60,7 @@ export async function getBoards(includeArchived = false) {
     .filter((b) => includeArchived || !b.archived)
     .map((b) => ({
       id: b.id,
+      workspaceId: b.workspaceId,
       title: b.title,
       description: b.description,
       background: b.background,
@@ -93,6 +94,7 @@ export async function createBoard(payload) {
   const backgrounds = await loadBoardBackgrounds();
   const board = {
     id: payload.id ?? id('board'),
+    workspaceId: payload.workspaceId,
     title: payload.title ?? 'Untitled Board',
     description: payload.description ?? '',
     background: payload.background ?? backgrounds[4],
@@ -119,6 +121,7 @@ export async function updateBoard(boardId, payload) {
     if (payload.archived !== undefined) board.archived = payload.archived;
     if (payload.labels !== undefined) board.labels = payload.labels;
     if (payload.members !== undefined) board.members = payload.members;
+    if (payload.workspaceId !== undefined) board.workspaceId = payload.workspaceId;
     return board;
   });
 }

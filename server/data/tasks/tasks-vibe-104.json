@@ -1,11 +1,12 @@
 {
   "id": "vibe-104",
+  "workspaceId": "workspace-vibe",
   "content": {
     "title": "Documentation pass",
     "body": "Update README and API docs"
   },
   "meta": {
-    "assignee": "User2",
+    "assignee": "user-3",
     "labels": [
       "design"
     ],

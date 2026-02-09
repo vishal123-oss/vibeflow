@@ -31,9 +31,14 @@ export function validatePositiveNumber(value, field) {
 
 // Entity-specific validators (extend as needed for production)
 export function validateBoardPayload(payload) {
-  validateRequiredFields(payload, ['title'], 'board');
+  validateRequiredFields(payload, ['title', 'workspaceId'], 'board');
   if (payload.title && typeof payload.title !== 'string') {
     const err = new Error('Board title must be a string');
+    err.status = StatusCodes.BAD_REQUEST;
+    throw err;
+  }
+  if (payload.workspaceId && typeof payload.workspaceId !== 'string') {
+    const err = new Error('Board workspaceId must be a string');
     err.status = StatusCodes.BAD_REQUEST;
     throw err;
   }
@@ -90,4 +95,13 @@ export function validateListPayload(payload) {
 
 export function validateCardPayload(payload) {
   validateRequiredFields(payload, ['content'], 'card');
+}
+
+export function validateWorkspacePayload(payload) {
+  validateRequiredFields(payload, ['name'], 'workspace');
+  if (payload.name && typeof payload.name !== 'string') {
+    const err = new Error('Workspace name must be a string');
+    err.status = StatusCodes.BAD_REQUEST;
+    throw err;
+  }
 }

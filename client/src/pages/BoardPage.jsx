@@ -35,10 +35,13 @@ export function BoardPage() {
   const { user, loading: authLoading } = useAuth();
   const {
     activeBoard,
+    workspaces,
+    selectedWorkspaceId,
     loading,
     error,
     fetchBoard,
     fetchMeta,
+    fetchWorkspaces,
     updateBoard,
     deleteBoard,
     createList,
@@ -61,6 +64,7 @@ export function BoardPage() {
     clearSearch,
     searchResults,
     clearError,
+    selectWorkspace,
   } = useBoards();
 
   const [selected, setSelected] = useState(null);
@@ -82,7 +86,8 @@ export function BoardPage() {
   useEffect(() => {
     fetchBoard(boardId);
     fetchMeta();
-  }, [boardId, fetchBoard, fetchMeta]);
+    fetchWorkspaces();
+  }, [boardId, fetchBoard, fetchMeta, fetchWorkspaces]);
 
   const lists = useMemo(() => activeBoard?.lists ?? [], [activeBoard]);
 
@@ -299,6 +304,9 @@ export function BoardPage() {
 
       <BoardHeader
         board={activeBoard}
+        workspaces={workspaces}
+        selectedWorkspaceId={selectedWorkspaceId}
+        onSelectWorkspace={selectWorkspace}
         onUpdate={(payload) => updateBoard(boardId, payload)}
         onDelete={handleDeleteBoard}
       />

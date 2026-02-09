@@ -1,11 +1,12 @@
 {
   "id": "vibe-102",
+  "workspaceId": "workspace-vibe",
   "content": {
     "title": "Add Theme Engine",
     "body": "Create theme.css with design tokens"
   },
   "meta": {
-    "assignee": "User2",
+    "assignee": "user-3",
     "labels": [
       "frontend",
       "design"

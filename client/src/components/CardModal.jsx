@@ -199,11 +199,13 @@ export function CardModal({
               <div className={styles.section}>
                 <h4>Members</h4>
                 <div className={styles.membersDisplay}>
-                  {members.map((memberId) => {
-                    const member = boardMembers.find((m) => m.id === memberId);
+                  {members.map((member) => {
+                    // Handle string id or object {id, name, initials}
+                    const id = typeof member === 'string' ? member : member.id || member;
+                    const memberObj = boardMembers.find((m) => m.id === id) || (typeof member === 'object' ? member : {});
                     return (
-                      <span key={memberId} className={styles.memberAvatar} title={member?.name}>
-                        {member?.initials || memberId.slice(0, 2).toUpperCase()}
+                      <span key={id} className={styles.memberAvatar} title={memberObj?.name || id}>
+                        {memberObj?.initials || (typeof id === 'string' ? id.slice(0, 2).toUpperCase() : '??')}
                       </span>
                     );
                   })}

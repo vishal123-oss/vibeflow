@@ -1,0 +1,41 @@
+{
+  "id": "vibe-8",
+  "workspaceId": "workspace-vibe",
+  "content": {
+    "title": "Setup API",
+    "body": "Initialize express server with middleware"
+  },
+  "meta": {
+    "assignee": "user-2",
+    "labels": [
+      "backend",
+      "urgent"
+    ],
+    "priority": "high",
+    "dueDate": "2026-02-01T00:00:00.000Z"
+  },
+  "history": [
+    {
+      "action": "created",
+      "timestamp": "2026-01-25T10:00:00.000Z"
+    }
+  ],
+  "checklists": [
+    {
+      "id": "check-1",
+      "title": "Install dependencies",
+      "items": [
+        {
+          "id": "item-1",
+          "text": "npm install express",
+          "completed": true
+        },
+        {
+          "id": "item-2",
+          "text": "npm install cors",
+          "completed": false
+        }
+      ]
+    }
+  ]
+}

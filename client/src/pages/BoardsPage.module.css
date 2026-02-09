@@ -98,3 +98,45 @@
   color: var(--accent);
   font-weight: 600;
 }
+
+/* Workspace integration styles */
+.workspacesSection {
+  margin-bottom: var(--space-xl);
+}
+
+.workspacesSection h3 {
+  margin: 0 0 var(--space-md);
+  font-size: 1.2rem;
+  color: var(--text-primary);
+}
+
+.workspaceList {
+  display: flex;
+  gap: var(--space-md);
+  flex-wrap: wrap;
+}
+
+.workspaceCard {
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  border-radius: var(--radius-md);
+  padding: var(--space-md);
+  min-width: 180px;
+}
+
+.workspaceCard strong {
+  display: block;
+  margin-bottom: var(--space-xs);
+  color: var(--accent);
+}
+
+.workspaceCard p {
+  margin: 0 0 var(--space-xs);
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+}
+
+.workspaceCard small {
+  color: var(--text-muted);
+  font-size: 0.8rem;
+}

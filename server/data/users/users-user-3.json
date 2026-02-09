@@ -6,5 +6,8 @@
   "avatar": null,
   "initials": "CD",
   "role": "user",
-  "createdAt": "2026-01-25T10:02:00.000Z"
+  "createdAt": "2026-01-25T10:02:00.000Z",
+  "workspaces": [
+    "workspace-personal"
+  ]
 }
