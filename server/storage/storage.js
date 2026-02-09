@@ -1,7 +1,7 @@
 import fs from 'fs/promises';
 import path from 'path';
-
-const DATA_ROOT = path.resolve(process.cwd(), 'data');
+import { DATA_ROOT } from '../config.js';
+import { StatusCodes } from '../constants.js';
 
 async function ensureDir(dirPath) {
   try {
@@ -28,7 +28,7 @@ async function readFile(filePath) {
     if (err.code === 'ENOENT') return null;
     const error = new Error(`Failed to read ${filePath}: ${err.message}`);
     error.code = err.code;
-    error.status = 500;
+    error.status = StatusCodes.INTERNAL_SERVER_ERROR;
     throw error;
   }
 }
@@ -41,7 +41,7 @@ async function readJson(filePath) {
   } catch (err) {
     if (err.code === 'ENOENT') return null;
     const error = new Error(`Invalid JSON in ${filePath}: ${err.message}`);
-    error.status = 500;
+    error.status = StatusCodes.INTERNAL_SERVER_ERROR;
     throw error;
   }
 }
@@ -54,7 +54,7 @@ async function writeFile(filePath, content) {
     return content;
   } catch (err) {
     const error = new Error(`Failed to write ${filePath}: ${err.message}`);
-    error.status = 500;
+    error.status = StatusCodes.INTERNAL_SERVER_ERROR;
     throw error;
   }
 }
@@ -66,7 +66,7 @@ async function writeJson(filePath, data) {
     return await writeFile(filePath, content);
   } catch (err) {
     const error = new Error(`Failed to serialize/write JSON to ${filePath}: ${err.message}`);
-    error.status = 500;
+    error.status = StatusCodes.INTERNAL_SERVER_ERROR;
     throw error;
   }
 }
@@ -78,7 +78,7 @@ async function updateJson(filePath, updater) {
     return await writeJson(filePath, updated);
   } catch (err) {
     const error = new Error(`Update failed for ${filePath}: ${err.message}`);
-    error.status = err.status || 500;
+    error.status = err.status || StatusCodes.INTERNAL_SERVER_ERROR;
     throw error;
   }
 }
@@ -90,7 +90,7 @@ async function listFiles(dirPath) {
     return files.filter(f => f.endsWith('.json') && f !== 'index.json');
   } catch (err) {
     const error = new Error(`Failed to list ${dirPath}: ${err.message}`);
-    error.status = 500;
+    error.status = StatusCodes.INTERNAL_SERVER_ERROR;
     throw error;
   }
 }
@@ -118,7 +118,7 @@ export async function deleteRecord(entity, id) {
   } catch (err) {
     if (err.code === 'ENOENT') return false;
     const error = new Error(`Delete failed for ${entity}/${id}: ${err.message}`);
-    error.status = 500;
+    error.status = StatusCodes.INTERNAL_SERVER_ERROR;
     throw error;
   }
 }

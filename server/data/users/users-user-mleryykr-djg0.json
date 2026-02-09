@@ -1,0 +1,16 @@
+{
+  "id": "user-mleryykr-djg0",
+  "email": "test@gmail.co",
+  "hashedPassword": "$2b$10$n.DqaDb6.tA31sBOwiags.HnUIyyDmyqn/gLhzMP4jkbShgNLYbr.",
+  "password": "Vishal$123",
+  "firstName": "Vishal",
+  "lastName": "Sharma",
+  "avatar": null,
+  "initials": "VS",
+  "role": "user",
+  "address": "",
+  "bio": "",
+  "createdAt": "2026-02-09T06:12:26.379Z",
+  "updatedAt": "2026-02-09T06:12:26.379Z",
+  "inactive": false
+}

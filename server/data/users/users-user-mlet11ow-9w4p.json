@@ -1,0 +1,16 @@
+{
+  "id": "user-mlet11ow-9w4p",
+  "email": "vsharma@gmail.co",
+  "hashedPassword": "$2b$10$iy1lwZLlCuAD2AEAp5IIs.gL/JTHjc7FrS/WFaXOg73ifKr.qHij.",
+  "password": "Vishal$123",
+  "firstName": "Vishal",
+  "lastName": "Sharma",
+  "avatar": null,
+  "initials": "VS",
+  "role": "user",
+  "address": "",
+  "bio": "",
+  "createdAt": "2026-02-09T06:42:03.344Z",
+  "updatedAt": "2026-02-09T06:42:03.344Z",
+  "inactive": false
+}

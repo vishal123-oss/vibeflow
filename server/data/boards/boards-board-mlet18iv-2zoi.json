@@ -1,0 +1,49 @@
+{
+  "id": "board-mlet18iv-2zoi",
+  "title": "asxsd",
+  "description": "scds",
+  "background": {
+    "id": "gradient-dark",
+    "type": "gradient",
+    "value": "linear-gradient(135deg, #1a1a2e 0%, #16213e 100%)"
+  },
+  "starred": false,
+  "archived": false,
+  "createdAt": "2026-02-09T06:42:12.199Z",
+  "labels": [
+    {
+      "id": "label-mlet18iv-ijpu",
+      "name": "Bug",
+      "color": "#eb5a46"
+    },
+    {
+      "id": "label-mlet18iv-6zx0",
+      "name": "Feature",
+      "color": "#61bd4f"
+    },
+    {
+      "id": "label-mlet18iv-h7nv",
+      "name": "Enhancement",
+      "color": "#0079bf"
+    }
+  ],
+  "members": [],
+  "lists": [
+    {
+      "id": "list-mlet1fub-mrgq",
+      "title": "QA",
+      "position": 0,
+      "archived": false,
+      "createdAt": "2026-02-09T06:42:21.683Z",
+      "cards": []
+    },
+    {
+      "id": "list-mlet1n1g-y2t6",
+      "title": "Dev",
+      "position": 1,
+      "archived": false,
+      "createdAt": "2026-02-09T06:42:31.012Z",
+      "cards": []
+    }
+  ]
+}

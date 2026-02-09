@@ -5,9 +5,7 @@
  */
 
 import { getAllRecords, getRecord, saveRecord, deleteRecord } from '../storage/storage.js';
-
-const slug = () => `vibe-${Date.now().toString(36)}`;
-const now = () => new Date().toISOString();
+import { now, generateId } from '../utils/helpers.js';
 
 function addHistory(task, action) {
   const entry = { action, timestamp: now() };
@@ -29,7 +27,7 @@ export async function getById(id) {
 
 export async function create(payload) {
   const task = {
-    id: payload.id ?? slug(),
+    id: payload.id ?? generateId('vibe'),
     content: payload.content ?? { title: '', body: '' },
     meta: payload.meta ?? { assignee: '', labels: [], priority: 'medium' },
     history: [{ action: 'created', timestamp: now() }],

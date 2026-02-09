@@ -1,0 +1,16 @@
+{
+  "id": "user-mlerc1n7-hbea",
+  "email": "test1@gmail.c",
+  "hashedPassword": "$2b$10$yhPWW1PqmJX/L9P0agrWDOpYWVYWT9Z3lFVJfsS.nBKMuirHmLpdm",
+  "password": "123456789",
+  "firstName": "Vish",
+  "lastName": "sharma",
+  "avatar": null,
+  "initials": "VS",
+  "role": "user",
+  "address": "",
+  "bio": "",
+  "createdAt": "2026-02-09T05:54:37.267Z",
+  "updatedAt": "2026-02-09T05:54:37.267Z",
+  "inactive": false
+}

@@ -1,0 +1,16 @@
+{
+  "id": "user-mlesw2zn-bhxx",
+  "email": "vishal@gmail.com",
+  "hashedPassword": "$2b$10$wIASTmwyJMFYS9GHeZSliuZvmJO7RpDvtcy09/HUF7Ls/rq1.hzju",
+  "password": "Vishal$123",
+  "firstName": "Vishal",
+  "lastName": "Sharma",
+  "avatar": null,
+  "initials": "VS",
+  "role": "user",
+  "address": "",
+  "bio": "",
+  "createdAt": "2026-02-09T06:38:11.748Z",
+  "updatedAt": "2026-02-09T06:38:11.748Z",
+  "inactive": false
+}

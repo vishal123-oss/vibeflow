@@ -1,8 +1,6 @@
 import { getRecord, saveRecord, deleteRecord, listRecords, getAllRecords } from '../storage/storage.js';
 import bcrypt from 'bcryptjs';
-
-const now = () => new Date().toISOString();
-const id = (prefix) => `${prefix}-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 6)}`;
+import { now, generateId as id } from '../utils/helpers.js';
 
 export async function getUsers(includeInactive = false) {
   const users = await getAllRecords('users');

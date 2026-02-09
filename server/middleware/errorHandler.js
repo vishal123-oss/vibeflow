@@ -1,3 +1,5 @@
+import { NODE_ENV } from '../config.js';
+
 /**
  * Centralized error handler middleware.
  * Catches errors, logs them, and returns consistent JSON responses.
@@ -12,6 +14,6 @@ export function errorHandler(err, req, res, next) {
   res.status(status).json({
     error: true,
     message,
-    ...(process.env.NODE_ENV === 'development' && { stack: err.stack }),
+    ...(NODE_ENV === 'development' && { stack: err.stack }),
   });
 }

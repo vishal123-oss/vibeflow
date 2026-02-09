@@ -1,0 +1,66 @@
+{
+  "id": "board-mler7gnd-w2bm",
+  "title": "Vishal Test",
+  "description": "This is refactor task board",
+  "background": {
+    "id": "gradient-dark",
+    "type": "gradient",
+    "value": "linear-gradient(135deg, #1a1a2e 0%, #16213e 100%)"
+  },
+  "starred": false,
+  "archived": false,
+  "createdAt": "2026-02-09T05:51:03.433Z",
+  "labels": [
+    {
+      "id": "label-mler7gnd-qkf2",
+      "name": "Bug",
+      "color": "#eb5a46"
+    },
+    {
+      "id": "label-mler7gnd-um1d",
+      "name": "Feature",
+      "color": "#61bd4f"
+    },
+    {
+      "id": "label-mler7gnd-d9tj",
+      "name": "Enhancement",
+      "color": "#0079bf"
+    }
+  ],
+  "members": [],
+  "lists": [
+    {
+      "id": "list-mler7un8-3xfs",
+      "title": "Refactor all the constants to single file",
+      "position": 0,
+      "archived": false,
+      "createdAt": "2026-02-09T05:51:21.572Z",
+      "cards": [
+        {
+          "id": "card-mler8pqw-x5un",
+          "position": 0,
+          "archived": false,
+          "content": {
+            "title": "Constant",
+            "body": "C"
+          },
+          "cover": null,
+          "labels": [],
+          "members": [],
+          "dueDate": null,
+          "dueComplete": false,
+          "checklists": [],
+          "comments": [],
+          "attachments": [],
+          "activity": [
+            {
+              "action": "created",
+              "user": "user",
+              "timestamp": "2026-02-09T05:52:01.880Z"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

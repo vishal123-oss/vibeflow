@@ -1,75 +1,44 @@
 import { Router } from 'express';
 import * as store from '../data/tasks.js';
+import { asyncHandler, ensureFound } from '../utils/helpers.js';
+import { validateTaskPayload } from '../utils/validator.js';
+import { StatusCodes } from '../constants.js';
 
 const router = Router();
 
-router.post('/reset', async (req, res, next) => {
-  try {
-    const tasks = await store.reset(); // Note: reset now sync but loads FS
-    res.json(tasks);
-  } catch (e) {
-    next(e);
-  }
-});
+router.post('/reset', asyncHandler(async (req, res) => {
+  const tasks = await store.reset();
+  res.json(tasks);
+}));
 
-router.get('/', async (req, res, next) => {
-  try {
-    const tasks = await store.getAll();
-    res.json(tasks);
-  } catch (e) {
-    next(e);
-  }
-});
+router.get('/', asyncHandler(async (req, res) => {
+  const tasks = await store.getAll();
+  res.json(tasks);
+}));
 
-router.get('/:id', async (req, res, next) => {
-  try {
-    const task = await store.getById(req.params.id); // Make getById async if needed
-    if (!task) {
-      const err = new Error('Task not found');
-      err.status = 404;
-      throw err;
-    }
-    res.json(task);
-  } catch (e) {
-    next(e);
-  }
-});
+router.get('/:id', asyncHandler(async (req, res) => {
+  const task = await store.getById(req.params.id);
+  ensureFound(task, 'Task not found');
+  res.json(task);
+}));
 
-router.post('/', async (req, res, next) => {
-  try {
-    const task = await store.create(req.body); // Assume updated
-    res.status(201).json(task);
-  } catch (e) {
-    next(e);
-  }
-});
+router.post('/', asyncHandler(async (req, res) => {
+  validateTaskPayload(req.body);
+  const task = await store.create(req.body);
+  res.status(StatusCodes.CREATED).json(task);
+}));
 
-router.patch('/:id', async (req, res, next) => {
-  try {
-    const task = await store.update(req.params.id, req.body);
-    if (!task) {
-      const err = new Error('Task not found');
-      err.status = 404;
-      throw err;
-    }
-    res.json(task);
-  } catch (e) {
-    next(e);
-  }
-});
+router.patch('/:id', asyncHandler(async (req, res) => {
+  validateTaskPayload(req.body);
+  const task = await store.update(req.params.id, req.body);
+  ensureFound(task, 'Task not found');
+  res.json(task);
+}));
 
-router.delete('/:id', async (req, res, next) => {
-  try {
-    const task = await store.remove(req.params.id);
-    if (!task) {
-      const err = new Error('Task not found');
-      err.status = 404;
-      throw err;
-    }
-    res.status(204).send();
-  } catch (e) {
-    next(e);
-  }
-});
+router.delete('/:id', asyncHandler(async (req, res) => {
+  const task = await store.remove(req.params.id);
+  ensureFound(task, 'Task not found');
+  res.status(StatusCodes.NO_CONTENT).send();
+}));
 
 export default router;
