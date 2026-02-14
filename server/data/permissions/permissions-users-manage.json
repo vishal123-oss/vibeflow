@@ -1,7 +1,7 @@
 {
   "id": "users:manage",
   "name": "Manage Users",
-  "description": "Create/update/delete users, assign roles",
+  "description": "Create/update/delete users",
   "category": "users",
-  "createdAt": "2026-02-14T08:37:49.853Z"
+  "createdAt": "2026-02-14T09:10:11.986Z"
 }

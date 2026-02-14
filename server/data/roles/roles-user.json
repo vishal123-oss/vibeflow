@@ -1,24 +1,24 @@
 {
   "id": "user",
   "name": "User",
-  "description": "Standard CRUD (scoped to workspace as collaborator)",
+  "description": "Scoped CRUD",
   "permissions": [
-    "boards:create",
-    "boards:manage_checklists",
-    "boards:manage_comments",
+    "users:read",
+    "roles:read",
+    "permissions:read",
+    "workspaces:read",
+    "workspaces:create",
+    "workspaces:update",
+    "tasks:read",
+    "tasks:create",
+    "tasks:update",
+    "tasks:assign",
     "boards:meta_read",
     "boards:read",
+    "boards:create",
     "boards:update",
-    "permissions:read",
-    "roles:read",
-    "tasks:assign",
-    "tasks:create",
-    "tasks:read",
-    "tasks:update",
-    "users:read",
-    "workspaces:create",
-    "workspaces:read",
-    "workspaces:update"
+    "boards:manage_checklists",
+    "boards:manage_comments"
   ],
-  "createdAt": "2026-02-14T08:37:49.905Z"
+  "createdAt": "2026-02-14T09:10:11.986Z"
 }

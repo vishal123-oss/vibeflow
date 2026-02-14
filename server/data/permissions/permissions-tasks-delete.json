@@ -1,7 +1,7 @@
 {
   "id": "tasks:delete",
   "name": "Delete Tasks",
-  "description": "Remove tasks",
+  "description": "Remove",
   "category": "tasks",
-  "createdAt": "2026-02-14T08:37:49.886Z"
+  "createdAt": "2026-02-14T09:10:11.986Z"
 }

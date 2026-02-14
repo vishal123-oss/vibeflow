@@ -1,16 +1,16 @@
 {
   "id": "guest",
   "name": "Guest",
-  "description": "Read-only (view boards/tasks in workspace)",
+  "description": "Read-only",
   "permissions": [
+    "users:read",
+    "roles:read",
+    "permissions:read",
+    "workspaces:read",
+    "tasks:read",
     "boards:meta_read",
     "boards:read",
-    "boards:search",
-    "permissions:read",
-    "roles:read",
-    "tasks:read",
-    "users:read",
-    "workspaces:read"
+    "boards:search"
   ],
-  "createdAt": "2026-02-14T08:37:49.905Z"
+  "createdAt": "2026-02-14T09:10:11.986Z"
 }

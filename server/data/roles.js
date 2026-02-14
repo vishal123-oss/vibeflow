@@ -6,10 +6,8 @@
  * Roles entity: e.g., roles-admin.json {id, name, permissions: [permIds], ...}
  */
 
-import { getRecord, saveRecord, deleteRecord, getAllRecords, listRecords } from '../storage/storage.js';
-import { now, generateId as id } from '../utils/helpers.js';
-import * as permStore from './permissions.js'; // For resolving perms
-import * as usersStore from './users.js'; // For dummy super_admin
+import { getRecord, getAllRecords, saveRecord, deleteRecord } from '../storage/storage.js';
+import * as permStore from './permissions.js'; // For resolving perms (static from FS 'DB')
 
 // Load ops (FS 'DB')
 async function loadRole(roleId) {

@@ -1,7 +1,7 @@
 {
-  "id": "admin",
-  "name": "Admin",
-  "description": "Legacy ws_admin",
+  "id": "workspace_admin",
+  "name": "Workspace Admin",
+  "description": "Scoped full inside ws",
   "permissions": [
     "users:read",
     "users:manage",

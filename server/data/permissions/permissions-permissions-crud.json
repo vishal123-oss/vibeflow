@@ -1,7 +1,7 @@
 {
   "id": "permissions:crud",
   "name": "CRUD Permissions",
-  "description": "Create/update/delete permissions (super_admin only)",
+  "description": "SuperAdmin only",
   "category": "rbac",
-  "createdAt": "2026-02-14T08:37:49.868Z"
+  "createdAt": "2026-02-14T09:10:11.986Z"
 }

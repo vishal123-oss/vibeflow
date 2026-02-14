@@ -1,0 +1,7 @@
+{
+  "id": "boards:manage_lists",
+  "name": "Manage Lists",
+  "description": "CRUD lists",
+  "category": "boards",
+  "createdAt": "2026-02-14T09:10:11.986Z"
+}

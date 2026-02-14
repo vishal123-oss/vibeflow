@@ -1,7 +1,7 @@
 {
   "id": "workspaces:reset",
   "name": "Reset Workspaces",
-  "description": "Admin-only data reset",
+  "description": "Admin-only",
   "category": "workspaces",
-  "createdAt": "2026-02-14T08:37:49.877Z"
+  "createdAt": "2026-02-14T09:10:11.986Z"
 }

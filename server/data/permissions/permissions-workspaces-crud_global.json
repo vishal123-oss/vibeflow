@@ -1,6 +1,6 @@
 {
-  "id": "workspaces:delete",
-  "name": "Delete Workspaces",
+  "id": "workspaces:crud_global",
+  "name": "Global CRUD",
   "description": "SuperAdmin only",
   "category": "workspaces",
   "createdAt": "2026-02-14T09:10:11.986Z"

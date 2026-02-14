@@ -1,7 +1,7 @@
 {
   "id": "roles:crud",
   "name": "CRUD Roles",
-  "description": "Create/update/delete roles (super_admin only)",
+  "description": "SuperAdmin only",
   "category": "rbac",
-  "createdAt": "2026-02-14T08:37:49.857Z"
+  "createdAt": "2026-02-14T09:10:11.986Z"
 }
