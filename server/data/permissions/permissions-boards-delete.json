@@ -1,0 +1,7 @@
+{
+  "id": "boards:delete",
+  "name": "Delete Boards",
+  "description": "Remove boards",
+  "category": "boards",
+  "createdAt": "2026-02-14T08:08:32.175Z"
+}

@@ -1,0 +1,7 @@
+{
+  "id": "boards:manage_labels",
+  "name": "Manage Board Labels",
+  "description": "CRUD labels",
+  "category": "boards",
+  "createdAt": "2026-02-14T08:08:32.177Z"
+}

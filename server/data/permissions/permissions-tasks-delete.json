@@ -1,0 +1,7 @@
+{
+  "id": "tasks:delete",
+  "name": "Delete Tasks",
+  "description": "Remove tasks",
+  "category": "tasks",
+  "createdAt": "2026-02-14T08:08:32.166Z"
+}

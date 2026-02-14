@@ -1,0 +1,7 @@
+{
+  "id": "workspaces:manage_members",
+  "name": "Manage Workspace Members",
+  "description": "Add/remove members, roles",
+  "category": "workspaces",
+  "createdAt": "2026-02-14T08:08:32.157Z"
+}

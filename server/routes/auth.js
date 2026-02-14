@@ -2,13 +2,13 @@ import { Router } from 'express';
 import bcrypt from 'bcryptjs';
 import * as usersStore from '../data/users.js';
 import { asyncHandler, createAuthTokens, createAccessToken, setRefreshCookie, REFRESH_SECRET } from '../utils/helpers.js';
-import { AuthConstants, Roles } from '../constants.js';
+import { AuthConstants } from '../constants.js';
 import { validateUserPayload } from '../utils/validator.js';
 import { StatusCodes } from '../constants.js';
-// RBAC imports for gating APIs with permission/role guards
+// RBAC: now FS-based (data/roles.js + data/permissions.js); gates use perm ID strings (matching DB keys)
+// No constants/enums outside data/ folder; createAccessToken async (awaits DB load) but wrapped in asyncHandler
 // Only /users requires auth here (others public: login/signup/refresh/logout)
 import { authenticateToken, authorizePermission } from '../middleware/auth.js';
-import { Permissions } from '../constants.js';
 import jwt from 'jsonwebtoken';
 
 const router = Router();
@@ -41,7 +41,8 @@ router.post('/signup', asyncHandler(async (req, res) => {
     initials: `${firstName?.[0] || ''}${lastName?.[0] || ''}`.toUpperCase(),
   });
 
-  const { accessToken, refreshToken } = createAuthTokens(user);
+  // createAuthTokens now async (loads role's perms from data/roles 'DB')
+  const { accessToken, refreshToken } = await createAuthTokens(user);
   setRefreshCookie(res, refreshToken);
 
   res.status(StatusCodes.CREATED).json({ 
@@ -62,7 +63,8 @@ router.post('/login', asyncHandler(async (req, res) => {
     throw err;
   }
 
-  const { accessToken, refreshToken } = createAuthTokens(user);
+  // createAuthTokens now async (loads role's perms from data/roles 'DB')
+  const { accessToken, refreshToken } = await createAuthTokens(user);
   setRefreshCookie(res, refreshToken);
 
   res.json({ 
@@ -83,10 +85,11 @@ router.post('/refresh', asyncHandler(async (req, res) => {
   }
 
   const payload = jwt.verify(refreshToken, REFRESH_SECRET);
-  // Lookup full user to embed current role/permissions in accessToken
-  // (handles role changes; fallback if not found)
-  const user = await usersStore.getUserById(payload.id) || { id: payload.id, role: Roles.USER };
-  const accessToken = createAccessToken(user);
+  // Lookup full user to embed current role/permissions in accessToken (from data/roles DB)
+  // (handles role changes; fallback to 'user' if not found)
+  const user = await usersStore.getUserById(payload.id) || { id: payload.id, role: 'user' };
+  // createAccessToken now async (loads perms for role from FS 'DB')
+  const accessToken = await createAccessToken(user);
 
   res.json({ accessToken });
 }));
@@ -98,9 +101,10 @@ router.post('/logout', (req, res) => {
 });
 
 // Get all users
-// Gated with permission guard: requires 'users:read' (both admin/user have it per RolePermissions)
+// Gated with permission guard: requires 'users:read' (both admin/user/member etc have it per data/roles DB)
 // Added authenticateToken for security (previously public; exposes sensitive user data)
-router.get('/users', authenticateToken, authorizePermission(Permissions.USERS_READ), asyncHandler(async (req, res) => {
+// Perm string matches DB entity key (no constants outside data/)
+router.get('/users', authenticateToken, authorizePermission('users:read'), asyncHandler(async (req, res) => {
   const users = await usersStore.getUsers();
   res.json(users);
 }));

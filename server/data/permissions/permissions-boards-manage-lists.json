@@ -1,0 +1,7 @@
+{
+  "id": "boards:manage_lists",
+  "name": "Manage Lists",
+  "description": "CRUD/reorder lists",
+  "category": "boards",
+  "createdAt": "2026-02-14T08:08:32.179Z"
+}

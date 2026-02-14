@@ -1,0 +1,7 @@
+{
+  "id": "boards:meta_read",
+  "name": "Read Board Meta",
+  "description": "Access label colors/backgrounds",
+  "category": "boards",
+  "createdAt": "2026-02-14T08:08:32.171Z"
+}

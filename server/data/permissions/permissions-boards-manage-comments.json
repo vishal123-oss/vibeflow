@@ -1,0 +1,7 @@
+{
+  "id": "boards:manage_comments",
+  "name": "Manage Comments",
+  "description": "CRUD comments",
+  "category": "boards",
+  "createdAt": "2026-02-14T08:08:32.184Z"
+}

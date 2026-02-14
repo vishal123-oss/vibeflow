@@ -3,11 +3,12 @@ import { JWT_SECRET } from '../utils/helpers.js';
 import { StatusCodes } from '../constants.js';
 
 // RBAC guards for the permission/role-based access control system
-// authenticateToken: base auth + attaches user (incl. role/permissions from JWT payload)
+// Now powered by FS 'DB' (data/roles.js + data/permissions.js - no constants elsewhere)
+// authenticateToken: base auth + attaches user (incl. role/permissions from JWT payload loaded via helpers)
 // authorizeRole: simple role check (e.g., admin-only for resets)
-// authorizePermission: granular perm check (main guard for all APIs as per req)
-// Permissions/roles defined in constants.js; embedded in JWT for stateless, secure checks
+// authorizePermission: granular perm check (main guard for all APIs; perms from role in data/ DB)
 // If user lacks perm/role: 403 Forbidden; integrates with errorHandler.
+// All roles/perms read from FS entity files (e.g., roles-admin.json embeds perm IDs).
 
 export function authenticateToken(req, res, next) {
   const authHeader = req.headers['authorization'];

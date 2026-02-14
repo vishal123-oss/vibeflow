@@ -1,0 +1,14 @@
+{
+  "id": "viewer",
+  "name": "Viewer",
+  "description": "Read-only access for stakeholders",
+  "permissions": [
+    "boards:meta_read",
+    "boards:read",
+    "boards:search",
+    "tasks:read",
+    "users:read",
+    "workspaces:read"
+  ],
+  "createdAt": "2026-02-14T08:08:32.191Z"
+}

@@ -1,0 +1,33 @@
+{
+  "id": "user",
+  "name": "User",
+  "description": "Standard CRUD access (excludes admin resets/manages for security)",
+  "permissions": [
+    "boards:create",
+    "boards:delete",
+    "boards:manage_archive",
+    "boards:manage_cards",
+    "boards:manage_checklists",
+    "boards:manage_comments",
+    "boards:manage_labels",
+    "boards:manage_lists",
+    "boards:manage_members",
+    "boards:meta_read",
+    "boards:read",
+    "boards:search",
+    "boards:update",
+    "tasks:assign",
+    "tasks:create",
+    "tasks:delete",
+    "tasks:read",
+    "tasks:update",
+    "users:manage",
+    "users:read",
+    "workspaces:create",
+    "workspaces:delete",
+    "workspaces:manage_members",
+    "workspaces:read",
+    "workspaces:update"
+  ],
+  "createdAt": "2026-02-14T08:08:32.191Z"
+}

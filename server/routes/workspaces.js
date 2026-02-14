@@ -5,9 +5,9 @@ import { validateWorkspacePayload } from '../utils/validator.js';
 import { StatusCodes } from '../constants.js';
 // RBAC for permission guards on all workspace APIs
 // Leverages base authenticateToken (from server.js) + granular permission middleware
-// Mapping: see RolePermissions in constants.js (e.g., reset only for admin role)
+// Now FS-based: perms/roles from data/permissions.js + data/roles.js (no constants/RolePermissions)
+// Guards use perm ID strings matching DB keys (e.g., 'workspaces:reset' only for admin role)
 import { authorizePermission } from '../middleware/auth.js';
-import { Permissions } from '../constants.js';
 
 const router = Router();
 
@@ -55,13 +55,13 @@ const resetWorkspaces = asyncHandler(async (req, res) => {
 
 // Routes - each gated with permission guard (if no perm/role match in JWT -> 403)
 // This implements the RBAC system: unauthorized users cannot perform actions
-// e.g., WORKSPACES_RESET only admins have per RolePermissions; others user-accessible
-// Future enhancement: add ownership checks (e.g., workspace ownerId == req.user.id)
-router.get('/', authorizePermission(Permissions.WORKSPACES_READ), getAllWorkspaces);
-router.get('/:workspaceId', authorizePermission(Permissions.WORKSPACES_READ), getWorkspaceById);
-router.post('/', authorizePermission(Permissions.WORKSPACES_CREATE), createWorkspace);
-router.patch('/:workspaceId', authorizePermission(Permissions.WORKSPACES_UPDATE), updateWorkspace);
-router.delete('/:workspaceId', authorizePermission(Permissions.WORKSPACES_DELETE), deleteWorkspace);
-router.post('/reset', authorizePermission(Permissions.WORKSPACES_RESET), resetWorkspaces);
+// Perm strings from data/permissions DB (e.g., 'workspaces:reset' only for admin role in data/roles);
+// No constants outside data/ folder. Future: add ownership checks (e.g., workspace ownerId == req.user.id)
+router.get('/', authorizePermission('workspaces:read'), getAllWorkspaces);
+router.get('/:workspaceId', authorizePermission('workspaces:read'), getWorkspaceById);
+router.post('/', authorizePermission('workspaces:create'), createWorkspace);
+router.patch('/:workspaceId', authorizePermission('workspaces:update'), updateWorkspace);
+router.delete('/:workspaceId', authorizePermission('workspaces:delete'), deleteWorkspace);
+router.post('/reset', authorizePermission('workspaces:reset'), resetWorkspaces);
 
 export default router;

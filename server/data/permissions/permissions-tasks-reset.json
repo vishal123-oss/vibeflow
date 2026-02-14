@@ -1,0 +1,7 @@
+{
+  "id": "tasks:reset",
+  "name": "Reset Tasks",
+  "description": "Admin-only reset",
+  "category": "tasks",
+  "createdAt": "2026-02-14T08:08:32.169Z"
+}

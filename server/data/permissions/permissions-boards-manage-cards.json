@@ -1,0 +1,7 @@
+{
+  "id": "boards:manage_cards",
+  "name": "Manage Cards",
+  "description": "CRUD/move/reorder cards",
+  "category": "boards",
+  "createdAt": "2026-02-14T08:08:32.183Z"
+}

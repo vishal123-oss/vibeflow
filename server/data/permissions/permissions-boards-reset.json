@@ -1,0 +1,7 @@
+{
+  "id": "boards:reset",
+  "name": "Reset Boards",
+  "description": "Admin-only reset",
+  "category": "boards",
+  "createdAt": "2026-02-14T08:08:32.176Z"
+}

@@ -11,6 +11,16 @@ import authRouter from './routes/auth.js';
 import { PORT } from './config.js';
 import { StatusCodes } from './constants.js';
 
+// RBAC init (loads/seeds roles + permissions from FS DB in data/roles/ + data/permissions/)
+// Ensures entities ready (like boards reset); no constants used - all from data/ 'DB'
+import('./data/roles.js').then((rolesStore) => 
+  rolesStore.initializeRoles()
+).then(() => {
+  console.log('[RBAC] Roles and permissions DB initialized from FS entities');
+}).catch(err => {
+  console.error('[RBAC] Init failed:', err);
+});
+
 const app = express();
 
 app.use(cors());

@@ -1,0 +1,7 @@
+{
+  "id": "boards:manage_checklists",
+  "name": "Manage Checklists",
+  "description": "CRUD checklists",
+  "category": "boards",
+  "createdAt": "2026-02-14T08:08:32.184Z"
+}

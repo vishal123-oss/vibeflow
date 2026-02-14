@@ -1,0 +1,7 @@
+{
+  "id": "tasks:read",
+  "name": "Read Tasks",
+  "description": "View tasks",
+  "category": "tasks",
+  "createdAt": "2026-02-14T08:08:32.159Z"
+}

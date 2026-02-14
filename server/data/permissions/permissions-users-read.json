@@ -1,0 +1,7 @@
+{
+  "id": "users:read",
+  "name": "Read Users",
+  "description": "View user lists (e.g., assignee dropdowns)",
+  "category": "users",
+  "createdAt": "2026-02-14T08:08:32.095Z"
+}
