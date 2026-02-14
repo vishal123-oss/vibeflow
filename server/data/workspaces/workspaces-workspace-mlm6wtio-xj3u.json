@@ -1,0 +1,14 @@
+{
+  "id": "workspace-mlm6wtio-xj3u",
+  "name": "RBAC Demo WS",
+  "description": "",
+  "ownerId": "super-admin",
+  "members": [
+    {
+      "userId": "super-admin",
+      "role": "workspace_admin"
+    }
+  ],
+  "createdAt": "2026-02-14T10:45:03.984Z",
+  "updatedAt": "2026-02-14T10:45:03.984Z"
+}

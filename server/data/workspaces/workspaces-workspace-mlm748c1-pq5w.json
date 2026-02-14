@@ -1,0 +1,14 @@
+{
+  "id": "workspace-mlm748c1-pq5w",
+  "name": "RBAC Demo WS",
+  "description": "",
+  "ownerId": "super-admin",
+  "members": [
+    {
+      "userId": "super-admin",
+      "role": "workspace_admin"
+    }
+  ],
+  "createdAt": "2026-02-14T10:50:49.777Z",
+  "updatedAt": "2026-02-14T10:50:49.777Z"
+}

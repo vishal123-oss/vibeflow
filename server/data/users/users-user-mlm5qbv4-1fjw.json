@@ -1,0 +1,17 @@
+{
+  "id": "user-mlm5qbv4-1fjw",
+  "email": "demouser@gmail.com",
+  "hashedPassword": "$2b$10$GGKcy5P7cD05na33OYgJmuJ3ihsgxGFWp5T317Asa13lOFCT7zwmW",
+  "password": "Vishal$12345",
+  "firstName": "Demo",
+  "lastName": "User",
+  "avatar": null,
+  "initials": "DU",
+  "role": "user",
+  "address": "",
+  "bio": "",
+  "workspaces": [],
+  "createdAt": "2026-02-14T10:12:01.552Z",
+  "updatedAt": "2026-02-14T10:12:01.552Z",
+  "inactive": false
+}

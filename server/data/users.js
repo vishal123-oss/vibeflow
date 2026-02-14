@@ -76,7 +76,7 @@ export async function seedSuperAdmin() {
   const superAdmin = {
     id: 'super-admin',
     email: 'superadmin@vibeflow.com',
-    password: 'superpass123', // triggers hash in createUser
+    password: 'SuperAdmin@123', // triggers hash in createUser
     firstName: 'Super',
     lastName: 'Admin',
     role: 'super_admin', // global strict for rbac/workspace CRUD

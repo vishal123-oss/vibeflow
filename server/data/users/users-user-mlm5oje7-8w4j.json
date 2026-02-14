@@ -1,0 +1,17 @@
+{
+  "id": "user-mlm5oje7-8w4j",
+  "email": "superadmin@gmail.com",
+  "hashedPassword": "$2b$10$BjvXW5IN.0IiLT8gVZtKNON6CGpJTSW.O/fNm0O4JjxYp3tgNP0UC",
+  "password": "Vishal$12345",
+  "firstName": "Demo",
+  "lastName": "User",
+  "avatar": null,
+  "initials": "DU",
+  "role": "superadmin",
+  "address": "",
+  "bio": "",
+  "workspaces": [],
+  "createdAt": "2026-02-14T10:10:37.999Z",
+  "updatedAt": "2026-02-14T10:10:37.999Z",
+  "inactive": false
+}

@@ -1,11 +1,17 @@
 {
   "id": "super-admin",
   "email": "superadmin@vibeflow.com",
-  "hashedPassword": "b0",
+  "hashedPassword": "$2b$10$zL4PZdpnr1l5Nc9ZULU/cOamV7Nev0.NCMJRsguFWy23B3GnKrWlW",
+  "password": "SuperAdmin@123",
   "firstName": "Super",
   "lastName": "Admin",
-  "role": "super_admin",
+  "avatar": null,
   "initials": "SA",
-  "bio": "Top-level SuperAdmin",
-  "createdAt": "2026-02-14T09:10:11.986Z"
+  "role": "super_admin",
+  "address": "",
+  "bio": "Top-level SuperAdmin: manages roles, permissions, workspaces globally",
+  "workspaces": [],
+  "createdAt": "2026-02-14T10:33:12.389Z",
+  "updatedAt": "2026-02-14T10:33:12.389Z",
+  "inactive": false
 }

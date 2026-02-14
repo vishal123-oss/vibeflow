@@ -1,0 +1,7 @@
+{
+  "id": "demo:action",
+  "name": "Demo Action",
+  "description": "Demo perm",
+  "category": "rbac",
+  "createdAt": "2026-02-14T10:50:36.301Z"
+}

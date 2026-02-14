@@ -85,7 +85,7 @@ export function validatePassword(password) {
 export function validateUserPayload(payload) {
   validateRequiredFields(payload, ['email', 'password'], 'user');
   validateEmail(payload.email);
-  validatePassword(payload.password);
+  // validatePassword(payload.password);
 }
 
 // Generic for lists/cards/etc (used in boards routes)
