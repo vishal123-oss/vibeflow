@@ -1,0 +1,33 @@
+{
+  "id": "board-mlm2o93s-upmx",
+  "workspaceId": "workspace-personal",
+  "title": "sc",
+  "description": "",
+  "background": {
+    "id": "gradient-dark",
+    "type": "gradient",
+    "value": "linear-gradient(135deg, #1a1a2e 0%, #16213e 100%)"
+  },
+  "starred": false,
+  "archived": false,
+  "createdAt": "2026-02-14T08:46:25.816Z",
+  "labels": [
+    {
+      "id": "label-mlm2o93s-z7mt",
+      "name": "Bug",
+      "color": "#eb5a46"
+    },
+    {
+      "id": "label-mlm2o93s-4onf",
+      "name": "Feature",
+      "color": "#61bd4f"
+    },
+    {
+      "id": "label-mlm2o93s-n21t",
+      "name": "Enhancement",
+      "color": "#0079bf"
+    }
+  ],
+  "members": [],
+  "lists": []
+}

@@ -1,6 +1,8 @@
 import jwt from 'jsonwebtoken';
 import { JWT_SECRET } from '../utils/helpers.js';
 import { StatusCodes } from '../constants.js';
+// Scoped stores for workspace-aware guards (RBAC extension)
+import * as workspaceStore from '../data/workspaces.js';
 
 // RBAC guards for the permission/role-based access control system
 // Now powered by FS 'DB' (data/roles.js + data/permissions.js - no constants elsewhere)
@@ -52,5 +54,57 @@ export function authorizePermission(permission) {
       return next(err);
     }
     next();
+  };
+}
+
+// New guards for scoped 'who can access what' RBAC (per req)
+// SuperAdmin: only for global CRUD on roles/perms/workspaces/users
+export function authorizeSuperAdmin() {
+  return (req, res, next) => {
+    if (!req.user || req.user.role !== 'super_admin') {
+      const err = new Error('SuperAdmin required for global CRUD (roles, permissions, workspaces)');
+      err.status = StatusCodes.FORBIDDEN;
+      return next(err);
+    }
+    next();
+  };
+}
+
+// Workspace scoped: workspace_admin/owner for inside actions (create users, assign roles/perms scoped)
+// SuperAdmin bypasses; uses workspace.members or ownerId from data/workspaces DB
+export function authorizeWorkspaceAccess(workspaceIdParam = 'workspaceId', requiredRole = 'workspace_admin') {
+  return async (req, res, next) => {
+    try {
+      const workspaceId = req.params[workspaceIdParam];
+      if (!workspaceId) {
+        const err = new Error('Workspace ID required');
+        err.status = StatusCodes.BAD_REQUEST;
+        return next(err);
+      }
+      const ws = await workspaceStore.getWorkspaceById(workspaceId);
+      if (!ws) {
+        const err = new Error('Workspace not found');
+        err.status = StatusCodes.NOT_FOUND;
+        return next(err);
+      }
+      // SuperAdmin always bypasses scoped checks
+      if (req.user.role === 'super_admin') {
+        req.workspace = ws;
+        return next();
+      }
+      // Check owner or member with required role
+      const isOwner = ws.ownerId === req.user.id;
+      const member = (ws.members || []).find(m => m.userId === req.user.id);
+      const hasAccess = isOwner || (member && member.role === requiredRole);
+      if (!hasAccess) {
+        const err = new Error(`Insufficient workspace access: ${requiredRole} or owner required`);
+        err.status = StatusCodes.FORBIDDEN;
+        return next(err);
+      }
+      req.workspace = ws; // attach for handlers
+      next();
+    } catch (e) {
+      next(e);
+    }
   };
 }

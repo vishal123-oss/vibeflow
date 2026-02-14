@@ -1,0 +1,7 @@
+{
+  "id": "workspaces:crud_global",
+  "name": "Global Workspaces CRUD",
+  "description": "Super_admin only for top-level workspace ops",
+  "category": "workspaces",
+  "createdAt": "2026-02-14T08:37:49.883Z"
+}

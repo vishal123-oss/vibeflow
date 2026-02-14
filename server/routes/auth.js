@@ -1,14 +1,16 @@
 import { Router } from 'express';
 import bcrypt from 'bcryptjs';
 import * as usersStore from '../data/users.js';
-import { asyncHandler, createAuthTokens, createAccessToken, setRefreshCookie, REFRESH_SECRET } from '../utils/helpers.js';
+import * as rolesStore from '../data/roles.js';
+import * as permStore from '../data/permissions.js';
+import { asyncHandler, createAuthTokens, createAccessToken, setRefreshCookie, REFRESH_SECRET, generateId as id } from '../utils/helpers.js';
 import { AuthConstants } from '../constants.js';
 import { validateUserPayload } from '../utils/validator.js';
 import { StatusCodes } from '../constants.js';
 // RBAC: now FS-based (data/roles.js + data/permissions.js); gates use perm ID strings (matching DB keys)
 // No constants/enums outside data/ folder; createAccessToken async (awaits DB load) but wrapped in asyncHandler
-// Only /users requires auth here (others public: login/signup/refresh/logout)
-import { authenticateToken, authorizePermission } from '../middleware/auth.js';
+// /users, /roles, /permissions require auth; rbac CRUD only super_admin
+import { authenticateToken, authorizePermission, authorizeSuperAdmin } from '../middleware/auth.js';
 import jwt from 'jsonwebtoken';
 
 const router = Router();
@@ -107,6 +109,45 @@ router.post('/logout', (req, res) => {
 router.get('/users', authenticateToken, authorizePermission('users:read'), asyncHandler(async (req, res) => {
   const users = await usersStore.getUsers();
   res.json(users);
+}));
+
+// RBAC mgmt APIs (/roles, /permissions) - strict: SuperAdmin only for CRUD (global top-level)
+// Follows boards.js structure; read for auth users, write gated by authorizeSuperAdmin
+// This enforces: only super_admin can add/change/delete roles/permissions (per req)
+router.get('/roles', authenticateToken, authorizePermission('roles:read'), asyncHandler(async (req, res) => {
+  const roles = await rolesStore.getRoles();
+  res.json(roles);
+}));
+router.post('/roles', authenticateToken, authorizeSuperAdmin(), asyncHandler(async (req, res) => {
+  // SuperAdmin only (global CRUD)
+  const role = await rolesStore.saveRole({ ...req.body, id: req.body.id ?? id('role') });
+  res.status(StatusCodes.CREATED).json(role);
+}));
+router.patch('/roles/:roleId', authenticateToken, authorizeSuperAdmin(), asyncHandler(async (req, res) => {
+  const role = await rolesStore.updateRole(req.params.roleId, req.body);
+  res.json(role);
+}));
+router.delete('/roles/:roleId', authenticateToken, authorizeSuperAdmin(), asyncHandler(async (req, res) => {
+  await rolesStore.deleteRole(req.params.roleId);
+  res.status(StatusCodes.NO_CONTENT).send();
+}));
+
+// Permissions (similar superAdmin CRUD)
+router.get('/permissions', authenticateToken, authorizePermission('permissions:read'), asyncHandler(async (req, res) => {
+  const perms = await permStore.getPermissions();
+  res.json(perms);
+}));
+router.post('/permissions', authenticateToken, authorizeSuperAdmin(), asyncHandler(async (req, res) => {
+  const perm = await permStore.savePermission({ ...req.body, id: req.body.id ?? id('perm') });
+  res.status(StatusCodes.CREATED).json(perm);
+}));
+router.patch('/permissions/:permId', authenticateToken, authorizeSuperAdmin(), asyncHandler(async (req, res) => {
+  const perm = await permStore.updatePermission(req.params.permId, req.body);
+  res.json(perm);
+}));
+router.delete('/permissions/:permId', authenticateToken, authorizeSuperAdmin(), asyncHandler(async (req, res) => {
+  await permStore.deletePermission(req.params.permId);
+  res.status(StatusCodes.NO_CONTENT).send();
 }));
 
 export default router;

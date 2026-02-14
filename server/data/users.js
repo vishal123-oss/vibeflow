@@ -64,3 +64,34 @@ export async function resetUsers() {
   }
   return [];
 }
+
+// Seed dummy super_admin (top-level, full access for roles/perms/workspace CRUD)
+// As per req: first dummy in DB; password: superpass123 (hashed); email: superadmin@vibeflow.com
+export async function seedSuperAdmin() {
+  const existing = await getUserByEmail('superadmin@vibeflow.com');
+  if (existing) return existing;
+
+  // Hash for super_admin (bcrypt like auth.js) or placeholder to avoid dynamic import issue
+  // Password: superpass123 (for login); uses createUser hashing
+  const superAdmin = {
+    id: 'super-admin',
+    email: 'superadmin@vibeflow.com',
+    password: 'superpass123', // triggers hash in createUser
+    firstName: 'Super',
+    lastName: 'Admin',
+    role: 'super_admin', // global strict for rbac/workspace CRUD
+    initials: 'SA',
+    bio: 'Top-level SuperAdmin: manages roles, permissions, workspaces globally',
+    createdAt: now(),
+  };
+  return createUser(superAdmin);
+}
+
+// Init for users (ensures dummy super_admin; called from RBAC init)
+export async function initializeUsers() {
+  const users = await listRecords('users');
+  if (users.length === 0 || !(await getUserByEmail('superadmin@vibeflow.com'))) {
+    await seedSuperAdmin();
+  }
+  return getUsers();
+}

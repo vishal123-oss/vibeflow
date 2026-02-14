@@ -1,7 +1,7 @@
 {
   "id": "workspaces:create",
   "name": "Create Workspaces",
-  "description": "Create new workspaces",
+  "description": "Create new workspaces (super_admin only)",
   "category": "workspaces",
-  "createdAt": "2026-02-14T08:08:32.144Z"
+  "createdAt": "2026-02-14T08:37:49.870Z"
 }

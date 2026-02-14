@@ -1,7 +1,7 @@
 {
   "id": "workspaces:delete",
   "name": "Delete Workspaces",
-  "description": "Delete workspaces",
+  "description": "Delete workspaces (super_admin only)",
   "category": "workspaces",
-  "createdAt": "2026-02-14T08:08:32.155Z"
+  "createdAt": "2026-02-14T08:37:49.874Z"
 }

@@ -1,6 +1,8 @@
 [
   "admin",
-  "member",
+  "collaborator",
+  "guest",
+  "super_admin",
   "user",
-  "viewer"
+  "workspace_admin"
 ]

@@ -1,24 +1,19 @@
 {
-  "id": "user",
-  "name": "User",
-  "description": "Standard CRUD (scoped to workspace as collaborator)",
+  "id": "collaborator",
+  "name": "Collaborator",
+  "description": "Workspace collab: read + edit own tasks/comments/checklists (scoped)",
   "permissions": [
-    "boards:create",
+    "boards:manage_cards",
     "boards:manage_checklists",
     "boards:manage_comments",
     "boards:meta_read",
     "boards:read",
-    "boards:update",
     "permissions:read",
     "roles:read",
     "tasks:assign",
-    "tasks:create",
     "tasks:read",
-    "tasks:update",
     "users:read",
-    "workspaces:create",
-    "workspaces:read",
-    "workspaces:update"
+    "workspaces:read"
   ],
   "createdAt": "2026-02-14T08:37:49.905Z"
 }

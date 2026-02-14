@@ -1,0 +1,11 @@
+{
+  "id": "super-admin",
+  "email": "superadmin@vibeflow.com",
+  "hashedPassword": "$2b$10$placeholderhash",
+  "firstName": "Super",
+  "lastName": "Admin",
+  "role": "super_admin",
+  "initials": "SA",
+  "bio": "Top-level SuperAdmin: manages roles, permissions, workspaces globally",
+  "createdAt": "2026-02-14T08:37:56.104Z"
+}

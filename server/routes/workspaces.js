@@ -7,7 +7,8 @@ import { StatusCodes } from '../constants.js';
 // Leverages base authenticateToken (from server.js) + granular permission middleware
 // Now FS-based: perms/roles from data/permissions.js + data/roles.js (no constants/RolePermissions)
 // Guards use perm ID strings matching DB keys (e.g., 'workspaces:reset' only for admin role)
-import { authorizePermission } from '../middleware/auth.js';
+// Strict: super_admin for global CRUD; workspace_admin for scoped (inside workspace, members/roles)
+import { authorizePermission, authorizeSuperAdmin, authorizeWorkspaceAccess } from '../middleware/auth.js';
 
 const router = Router();
 
@@ -53,15 +54,34 @@ const resetWorkspaces = asyncHandler(async (req, res) => {
   sendOk(res, workspaces);
 });
 
-// Routes - each gated with permission guard (if no perm/role match in JWT -> 403)
-// This implements the RBAC system: unauthorized users cannot perform actions
-// Perm strings from data/permissions DB (e.g., 'workspaces:reset' only for admin role in data/roles);
-// No constants outside data/ folder. Future: add ownership checks (e.g., workspace ownerId == req.user.id)
-router.get('/', authorizePermission('workspaces:read'), getAllWorkspaces);
-router.get('/:workspaceId', authorizePermission('workspaces:read'), getWorkspaceById);
-router.post('/', authorizePermission('workspaces:create'), createWorkspace);
-router.patch('/:workspaceId', authorizePermission('workspaces:update'), updateWorkspace);
-router.delete('/:workspaceId', authorizePermission('workspaces:delete'), deleteWorkspace);
-router.post('/reset', authorizePermission('workspaces:reset'), resetWorkspaces);
+// Routes - each gated with strict RBAC (super_admin for global CRUD on workspaces; workspace_admin for scoped)
+// This implements 'who can access what': super_admin global (workspaces CRUD), ws_admin inside ws (members/roles)
+// Perm strings from data/permissions DB; + super/workspace guards; no constants outside data/ folder
+// Future: full ownership checks
+router.get('/', authorizePermission('workspaces:read'), getAllWorkspaces); // auth users
+router.get('/:workspaceId', authorizePermission('workspaces:read'), authorizeWorkspaceAccess(), getWorkspaceById);
+router.post('/', authorizeSuperAdmin(), authorizePermission('workspaces:create'), createWorkspace); // super only (global)
+router.patch('/:workspaceId', authorizePermission('workspaces:update'), authorizeWorkspaceAccess(), updateWorkspace); // ws_admin scoped
+router.delete('/:workspaceId', authorizeSuperAdmin(), authorizePermission('workspaces:delete'), deleteWorkspace); // super only
+router.post('/reset', authorizeSuperAdmin(), authorizePermission('workspaces:reset'), resetWorkspaces); // super only
+
+// Scoped APIs for workspace_admin (create/assign users/roles/perms inside ws only; collaborator/guest limited)
+// e.g., /members for manage users/roles scoped to ws
+router.get('/:workspaceId/members', authorizePermission('workspaces:manage_members'), authorizeWorkspaceAccess(), asyncHandler(async (req, res) => {
+  const members = await store.getWorkspaceMembers(req.params.workspaceId);
+  sendOk(res, members);
+}));
+router.post('/:workspaceId/members', authorizePermission('workspaces:manage_members'), authorizeWorkspaceAccess(), asyncHandler(async (req, res) => {
+  // ws_admin: add user/member (e.g., create/assign inside ws)
+  const { userId, role = 'collaborator' } = req.body;
+  const member = await store.addMember(req.params.workspaceId, userId, role);
+  sendCreated(res, member);
+}));
+router.patch('/:workspaceId/members/:userId/role', authorizePermission('workspaces:manage_members'), authorizeWorkspaceAccess(), asyncHandler(async (req, res) => {
+  // ws_admin: assign role/perm scoped
+  const { role } = req.body;
+  const updated = await store.assignRole(req.params.workspaceId, req.params.userId, role);
+  sendOk(res, updated);
+}));
 
 export default router;

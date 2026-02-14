@@ -1,7 +1,7 @@
 {
-  "id": "admin",
-  "name": "Admin",
-  "description": "Full access (legacy; maps to workspace_admin)",
+  "id": "workspace_admin",
+  "name": "Workspace Admin",
+  "description": "Workspace owner: all actions inside their workspace; manage members/roles/perms scoped only (not global CRUD)",
   "permissions": [
     "boards:create",
     "boards:delete",

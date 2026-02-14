@@ -51,13 +51,20 @@ async function seedPermissions() {
     { id: 'users:read', name: 'Read Users', description: 'View user lists (e.g., assignee dropdowns)', category: 'users' },
     { id: 'users:manage', name: 'Manage Users', description: 'Create/update/delete users, assign roles', category: 'users' },
 
-    // Workspaces
+    // Roles/Permissions mgmt (super_admin only for global CRUD)
+    { id: 'roles:read', name: 'Read Roles', description: 'View roles', category: 'rbac' },
+    { id: 'roles:crud', name: 'CRUD Roles', description: 'Create/update/delete roles (super_admin only)', category: 'rbac' },
+    { id: 'permissions:read', name: 'Read Permissions', description: 'View permissions', category: 'rbac' },
+    { id: 'permissions:crud', name: 'CRUD Permissions', description: 'Create/update/delete permissions (super_admin only)', category: 'rbac' },
+
+    // Workspaces (global CRUD super_admin only; workspace-scoped for admins)
     { id: 'workspaces:read', name: 'Read Workspaces', description: 'View workspaces/boards', category: 'workspaces' },
-    { id: 'workspaces:create', name: 'Create Workspaces', description: 'Create new workspaces', category: 'workspaces' },
+    { id: 'workspaces:create', name: 'Create Workspaces', description: 'Create new workspaces (super_admin only)', category: 'workspaces' },
     { id: 'workspaces:update', name: 'Update Workspaces', description: 'Edit workspace details', category: 'workspaces' },
-    { id: 'workspaces:delete', name: 'Delete Workspaces', description: 'Delete workspaces', category: 'workspaces' },
+    { id: 'workspaces:delete', name: 'Delete Workspaces', description: 'Delete workspaces (super_admin only)', category: 'workspaces' },
     { id: 'workspaces:reset', name: 'Reset Workspaces', description: 'Admin-only data reset', category: 'workspaces' },
     { id: 'workspaces:manage_members', name: 'Manage Workspace Members', description: 'Add/remove members, roles', category: 'workspaces' },
+    { id: 'workspaces:crud_global', name: 'Global Workspaces CRUD', description: 'Super_admin only for top-level workspace ops', category: 'workspaces' },
 
     // Tasks
     { id: 'tasks:read', name: 'Read Tasks', description: 'View tasks', category: 'tasks' },
@@ -67,7 +74,7 @@ async function seedPermissions() {
     { id: 'tasks:reset', name: 'Reset Tasks', description: 'Admin-only reset', category: 'tasks' },
     { id: 'tasks:assign', name: 'Assign Tasks', description: 'Assign to users', category: 'tasks' },
 
-    // Boards (Trello/Jira core + sub-resources)
+    // Boards (Trello/Jira core + sub-resources; scoped to workspace)
     { id: 'boards:meta_read', name: 'Read Board Meta', description: 'Access label colors/backgrounds', category: 'boards' },
     { id: 'boards:read', name: 'Read Boards', description: 'View boards/lists/cards', category: 'boards' },
     { id: 'boards:create', name: 'Create Boards', description: 'Create new boards', category: 'boards' },
@@ -107,4 +114,16 @@ export async function initializePermissions() {
     return seedPermissions();
   }
   return loadAllPermissions();
+}
+
+// Full CRUD for super_admin mgmt (follows users.js/boards.js; saveRecord from storage)
+export async function updatePermission(permId, payload) {
+  const perm = await getPermissionById(permId);
+  if (!perm) return null;
+  const updated = { ...perm, ...payload, updatedAt: now() };
+  return savePermission(updated);
+}
+
+export async function deletePermission(permId) {
+  return deleteRecord('permissions', permId);
 }
