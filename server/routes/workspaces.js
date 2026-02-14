@@ -3,6 +3,11 @@ import * as store from '../data/workspaces.js';
 import { asyncHandler, ensureFound } from '../utils/helpers.js';
 import { validateWorkspacePayload } from '../utils/validator.js';
 import { StatusCodes } from '../constants.js';
+// RBAC for permission guards on all workspace APIs
+// Leverages base authenticateToken (from server.js) + granular permission middleware
+// Mapping: see RolePermissions in constants.js (e.g., reset only for admin role)
+import { authorizePermission } from '../middleware/auth.js';
+import { Permissions } from '../constants.js';
 
 const router = Router();
 
@@ -48,12 +53,15 @@ const resetWorkspaces = asyncHandler(async (req, res) => {
   sendOk(res, workspaces);
 });
 
-// Routes
-router.get('/', getAllWorkspaces);
-router.get('/:workspaceId', getWorkspaceById);
-router.post('/', createWorkspace);
-router.patch('/:workspaceId', updateWorkspace);
-router.delete('/:workspaceId', deleteWorkspace);
-router.post('/reset', resetWorkspaces);
+// Routes - each gated with permission guard (if no perm/role match in JWT -> 403)
+// This implements the RBAC system: unauthorized users cannot perform actions
+// e.g., WORKSPACES_RESET only admins have per RolePermissions; others user-accessible
+// Future enhancement: add ownership checks (e.g., workspace ownerId == req.user.id)
+router.get('/', authorizePermission(Permissions.WORKSPACES_READ), getAllWorkspaces);
+router.get('/:workspaceId', authorizePermission(Permissions.WORKSPACES_READ), getWorkspaceById);
+router.post('/', authorizePermission(Permissions.WORKSPACES_CREATE), createWorkspace);
+router.patch('/:workspaceId', authorizePermission(Permissions.WORKSPACES_UPDATE), updateWorkspace);
+router.delete('/:workspaceId', authorizePermission(Permissions.WORKSPACES_DELETE), deleteWorkspace);
+router.post('/reset', authorizePermission(Permissions.WORKSPACES_RESET), resetWorkspaces);
 
 export default router;

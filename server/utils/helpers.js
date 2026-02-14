@@ -3,6 +3,9 @@ import {
   JWT_SECRET,
   REFRESH_SECRET,
   NODE_ENV,
+  // RBAC for token payload (roles/permissions included in JWT for stateless guards)
+  Roles,
+  RolePermissions,
 } from '../constants.js';
 import { AuthConstants, StatusCodes } from '../constants.js';
 
@@ -21,12 +24,35 @@ export function ensureFound(item, message = 'Resource not found') {
   return item;
 }
 
-export function createAuthTokens(user) {
-  const accessToken = jwt.sign(
-    { id: user.id, email: user.email, role: user.role },
+// Helper to create access token payload with RBAC data (role + permissions)
+// Used in auth tokens and refresh (ensures guards always have current perms from role mapping)
+function createAccessTokenPayload(user) {
+  // Permissions from RolePermissions map (single source in constants.js)
+  const permissions = RolePermissions[user.role] || RolePermissions[Roles.USER]; // fallback to user
+  return {
+    id: user.id,
+    email: user.email,
+    role: user.role,
+    permissions, // array for permission guard checks (stateless RBAC)
+  };
+}
+
+export function createAccessToken(user) {
+  // Creates signed access token with full RBAC payload (role/permissions)
+  // Called by createAuthTokens and refresh for consistency
+  return jwt.sign(
+    createAccessTokenPayload(user),
     JWT_SECRET,
     { expiresIn: AuthConstants.ACCESS_EXPIRES }
   );
+}
+
+export function createAuthTokens(user) {
+  // Full tokens for login/signup: access (with RBAC) + refresh
+  // Permissions derived from role (admin: all perms, user: CRUD ops)
+  // This powers permission/role guards across all APIs for security.
+  // Future: support dynamic per-user perms beyond role.
+  const accessToken = createAccessToken(user);
   const refreshToken = jwt.sign(
     { id: user.id },
     REFRESH_SECRET,
