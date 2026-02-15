@@ -6,7 +6,10 @@ import styles from './Layout.module.css';
 
 export function Layout() {
   const location = useLocation();
-  const { user, logout } = useAuth();
+  // RBAC integration: isSuperAdmin from AuthContext (user.role === 'super_admin' from token/FS DB)
+  // Shows permissions nav/UI only for super admin (task req; backend also enforces via authorizeSuperAdmin)
+  const { user, logout, isSuperAdmin } = useAuth();
+  // For permissions page, treat as boards view (main sidebar)
   const isTasksView = location.pathname.startsWith('/tasks');
   const SidebarComponent = isTasksView ? Sidebar : BoardSidebar;
 
@@ -35,6 +38,18 @@ export function Layout() {
               >
                 Tasks
               </NavLink>
+              {/* Super admin only nav link for permissions CRUD UI */}
+              {/* Hidden for other roles; visible @ /permissions; aligns with RBAC structure */}
+              {isSuperAdmin && (
+                <NavLink
+                  to="/permissions"
+                  className={({ isActive }) =>
+                    `${styles.navLink} ${isActive ? styles.activeLink : ''}`.trim()
+                  }
+                >
+                  Permissions
+                </NavLink>
+              )}
             </nav>
             {user && (
               <div className={styles.userSection}>

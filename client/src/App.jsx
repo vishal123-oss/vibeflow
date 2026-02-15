@@ -8,6 +8,7 @@ import { BoardPage } from './pages/BoardPage';
 import { TasksPage } from './pages/TasksPage';
 import { WorkspaceSelectPage } from './pages/WorkspaceSelectPage';
 import LoginPage from './pages/LoginPage';
+import { PermissionsPage } from './pages/PermissionsPage'; // Super admin only RBAC UI for permissions CRUD
 
 export default function App() {
   return (
@@ -22,6 +23,9 @@ export default function App() {
                 <Route index element={<BoardsPage />} />
                 <Route path="tasks" element={<TasksPage />} />
                 <Route path="boards/:boardId" element={<BoardPage />} />
+                {/* Super admin only: Permissions management UI (CRUD for data/permissions/ FS DB) */}
+                {/* Gated by isSuperAdmin from AuthContext (role='super_admin' + perms:crud) */}
+                <Route path="permissions" element={<PermissionsPage />} />
               </Route>
             </Routes>
           </BoardProvider>
