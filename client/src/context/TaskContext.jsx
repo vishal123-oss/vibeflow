@@ -1,7 +1,5 @@
 import { createContext, useCallback, useContext, useReducer } from 'react';
-import axios from 'axios';
-
-const API = '/api/tasks';
+import { taskService } from '../services/taskService';
 
 const TaskContext = createContext(null);
 
@@ -43,7 +41,7 @@ export function TaskProvider({ children }) {
   const fetchTasks = useCallback(async () => {
     dispatch({ type: 'FETCH_START' });
     try {
-      const { data } = await axios.get(API);
+      const { data } = await taskService.getAll();
       dispatch({ type: 'FETCH_SUCCESS', payload: data });
       return data;
     } catch (err) {
@@ -56,7 +54,7 @@ export function TaskProvider({ children }) {
   const addTask = useCallback(async (task) => {
     dispatch({ type: 'FETCH_START' });
     try {
-      const { data } = await axios.post(API, task);
+      const { data } = await taskService.create(task);
       dispatch({ type: 'OPTIMISTIC_ADD', payload: data });
       return data;
     } catch (err) {
@@ -79,7 +77,7 @@ export function TaskProvider({ children }) {
       },
     });
     try {
-      const { data } = await axios.patch(`${API}/${id}`, patch);
+      const { data } = await taskService.update(id, patch);
       dispatch({ type: 'OPTIMISTIC_UPDATE', payload: data });
       return data;
     } catch (err) {
@@ -95,7 +93,7 @@ export function TaskProvider({ children }) {
     if (!removed) return;
     dispatch({ type: 'OPTIMISTIC_REMOVE', payload: id });
     try {
-      await axios.delete(`${API}/${id}`);
+      await taskService.delete(id);
     } catch (err) {
       dispatch({ type: 'REVERT_REMOVE', payload: removed });
       const message = err.response?.data?.message ?? err.message ?? 'Delete failed — task restored';
@@ -107,7 +105,7 @@ export function TaskProvider({ children }) {
   const resetTasks = useCallback(async () => {
     dispatch({ type: 'FETCH_START' });
     try {
-      const { data } = await axios.post(`${API}/reset`);
+      const { data } = await taskService.reset();
       dispatch({ type: 'FETCH_SUCCESS', payload: data });
       return data;
     } catch (err) {

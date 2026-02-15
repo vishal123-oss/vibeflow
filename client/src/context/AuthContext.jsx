@@ -1,6 +1,7 @@
 import { createContext, useContext, useReducer, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { authService } from '../services/authService';
+import apiClient from '../utils/api'; // For interceptor/defaults (service wraps; no cycle issue)
 import { validateForm, validateRequired, validateUniqueId } from '../utils/validators';
 import { setStorage, getStorage, removeStorage } from '../utils/storage';
 

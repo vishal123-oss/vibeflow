@@ -1,8 +1,5 @@
 import { createContext, useCallback, useContext, useMemo, useReducer } from 'react';
-import axios from 'axios';
-
-const API = '/api/boards';
-const WORKSPACES_API = '/api/workspaces';
+import { boardService } from '../services/boardService';
 
 const BoardContext = createContext(null);
 
