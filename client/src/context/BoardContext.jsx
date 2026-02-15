@@ -112,12 +112,12 @@ export function BoardProvider({ children }) {
     dispatch({ type: 'ERROR', payload: message });
   }, []);
 
-  // Meta data
+  // Meta data (via service)
   const fetchMeta = useCallback(async () => {
     try {
       const [colors, backgrounds] = await Promise.all([
-        axios.get(`${API}/meta/label-colors`),
-        axios.get(`${API}/meta/backgrounds`),
+        boardService.getMetaLabelColors(),
+        boardService.getMetaBackgrounds(),
       ]);
       dispatch({
         type: 'SET_META',
@@ -130,7 +130,7 @@ export function BoardProvider({ children }) {
 
   const fetchWorkspaces = useCallback(async () => {
     try {
-      const { data } = await axios.get(WORKSPACES_API);
+      const { data } = await boardService.getWorkspaces();
       dispatch({ type: 'SET_WORKSPACES', payload: data });
       return data;
     } catch (err) {
@@ -143,7 +143,7 @@ export function BoardProvider({ children }) {
   const fetchBoards = useCallback(async () => {
     dispatch({ type: 'LOADING' });
     try {
-      const { data: allBoards } = await axios.get(API);
+      const { data: allBoards } = await boardService.getAll();
       dispatch({ type: 'SET_ALL_BOARDS', payload: allBoards });
       return allBoards;
     } catch (err) {
@@ -162,7 +162,7 @@ export function BoardProvider({ children }) {
   const fetchBoard = useCallback(async (boardId) => {
     dispatch({ type: 'LOADING' });
     try {
-      const { data } = await axios.get(`${API}/${boardId}`);
+      const { data } = await boardService.getById(boardId);
       dispatch({ type: 'SET_BOARD', payload: data });
       return data;
     } catch (err) {
