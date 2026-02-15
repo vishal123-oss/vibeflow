@@ -1,58 +1,183 @@
-/* Styles for super admin permissions CRUD UI - matches app's glassmorphism theme from theme.css */
-/* Visible only to super_admin; integrates RBAC from backend data/permissions/ FS DB */
+/* Updated styles for super admin permissions CRUD UI (per req):
+- Light BG for page (e.g., #f8f9fa), dark/bold fonts/buttons/items for contrast/readability.
+- Pixel-perfect alignment: flex/grid, consistent vars spacing, header content left/actions right.
+- Modal, filters, validation errors styled for UX/theme.
+- Overrides dark glassmorphism for admin page (dark bold items on light); uses theme.css vars where possible.
+- Visible/integrates only for super_admin RBAC.
+*/
 
 .page {
   padding: var(--space-xl);
   display: flex;
   flex-direction: column;
   gap: var(--space-lg);
-  background: linear-gradient(145deg, #1e1b4b 0%, #312e81 100%);
+  /* Light BG as requested for better UX on management page */
+  background: #f8f9fa;
   min-height: 100vh;
-  color: white;
+  color: #1a1a1a; /* Dark bold text */
+  font-family: var(--font-sans);
 }
 
 .header {
   display: flex;
-  align-items: center;
+  align-items: flex-start; /* Pixel-perfect vertical align for title + actions */
   justify-content: space-between;
   gap: var(--space-lg);
+  padding-bottom: var(--space-md);
+  border-bottom: 1px solid #e0e0e0; /* Subtle divider */
 }
 
-.header h2 {
+.headerContent {
+  flex: 1;
+}
+
+.headerContent h2 {
+  margin: 0 0 var(--space-xs);
+  font-size: 1.75rem; /* Bold larger header */
+  font-weight: 700;
+  color: #1a1a1a;
+}
+
+.headerContent p {
   margin: 0;
-  font-size: 1.5rem;
+  color: #4a4a4a; /* Dark secondary */
+  max-width: 600px;
+  font-size: 0.95rem;
 }
 
-.header p {
-  margin: var(--space-xs) 0 0;
-  color: var(--text-muted);
-  max-width: 600px;
+.headerActions {
+  display: flex;
+  align-items: center;
+}
+
+.filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-sm);
+  align-items: center;
+  background: #ffffff;
+  padding: var(--space-md);
+  border-radius: var(--radius-md);
+  border: 1px solid #e0e0e0;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05); /* Light subtle shadow */
+}
+
+.searchInput,
+.filters select {
+  padding: var(--space-sm);
+  border: 1px solid #ccc;
+  border-radius: var(--radius-sm);
+  background: #ffffff;
+  color: #1a1a1a; /* Dark font */
+  font-weight: 500;
+  min-width: 200px; /* For UX */
+}
+
+.searchInput:focus,
+.filters select:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 2px rgba(124, 92, 255, 0.2);
+}
+
+.clearBtn {
+  padding: var(--space-sm) var(--space-md);
+  background: #f0f0f0;
+  color: #333; /* Dark bold */
+  border: 1px solid #ccc;
+  border-radius: var(--radius-sm);
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.filterCount {
+  margin-left: auto;
+  color: #666;
+  font-size: 0.9rem;
+  font-weight: 500;
 }
 
 .error {
-  background: rgba(239, 68, 68, 0.12);
-  border: 1px solid rgba(239, 68, 68, 0.3);
-  color: #fca5a5;
+  background: #fef2f2;
+  border: 1px solid #ef4444;
+  color: #dc2626; /* Dark error red */
   padding: var(--space-sm);
   border-radius: var(--radius-md);
+  font-weight: 600;
 }
 
-.form {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-  gap: var(--space-md);
-  background: rgba(255, 255, 255, 0.08);
-  border: 1px solid rgba(255, 255, 255, 0.15);
+.fieldError {
+  color: #dc2626;
+  font-size: 0.85rem;
+  margin-top: var(--space-xs);
+  font-weight: 500;
+}
+
+.inputError {
+  border-color: #ef4444 !important;
+  background: #fef2f2 !important;
+}
+
+/* Modal for create/edit (dark bold items on light BG for pixel-perfect UX) */
+.modalOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5); /* Overlay */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  backdrop-filter: blur(4px);
+}
+
+.modal {
+  background: #ffffff; /* Light BG */
   border-radius: var(--radius-lg);
-  padding: var(--space-lg);
-  box-shadow: var(--card-shadow);
-  backdrop-filter: blur(12px);
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15); /* Bold shadow */
+  width: 90%;
+  max-width: 500px;
+  max-height: 90vh;
+  overflow: auto;
+  border: 1px solid #e0e0e0;
 }
 
-.form h3 {
-  grid-column: 1 / -1;
-  margin: 0 0 var(--space-sm);
-  font-size: 1.2rem;
+.modalHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--space-md) var(--space-lg);
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.modalHeader h3 {
+  margin: 0;
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #1a1a1a; /* Dark bold */
+}
+
+.closeModal {
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  color: #666;
+  cursor: pointer;
+  padding: var(--space-xs);
+  font-weight: bold;
+}
+
+.closeModal:hover {
+  color: #1a1a1a;
+}
+
+.modalForm {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+  padding: var(--space-lg);
 }
 
 .field {
@@ -62,73 +187,114 @@
 }
 
 .field label {
-  font-size: 0.85rem;
-  color: var(--text-muted);
+  font-size: 0.9rem;
+  color: #333; /* Dark bold label */
+  font-weight: 600;
   text-transform: uppercase;
-  letter-spacing: 0.08em;
+  letter-spacing: 0.05em;
 }
 
 .field input,
 .field textarea,
 .field select {
-  background: rgba(255, 255, 255, 0.04);
-  border: 1px solid var(--glass-border);
+  background: #ffffff;
+  border: 1px solid #ccc;
   border-radius: var(--radius-sm);
   padding: var(--space-sm);
-  color: var(--text-primary);
+  color: #1a1a1a; /* Dark font */
   font-size: 0.95rem;
+  font-weight: 500;
 }
 
-.actions {
-  grid-column: 1 / -1;
+.field input:focus,
+.field textarea:focus,
+.field select:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 2px rgba(124, 92, 255, 0.2);
+}
+
+.modalActions {
   display: flex;
   gap: var(--space-sm);
-  align-items: center;
+  justify-content: flex-end;
+  margin-top: var(--space-md);
 }
 
-.actions button {
-  padding: var(--space-sm) var(--space-md);
-  border: 1px solid var(--accent);
+.submitBtn {
+  padding: var(--space-sm) var(--space-lg);
+  background: var(--accent); /* Bold accent */
+  color: #ffffff;
+  border: none;
   border-radius: var(--radius-sm);
-  background: var(--accent-muted);
-  color: var(--accent);
-  font-weight: 600;
+  font-weight: 700;
   cursor: pointer;
-  transition: all var(--transition-speed) var(--ease-out);
+  transition: background var(--transition-speed) var(--ease-out);
 }
 
-.actions button:hover:not(:disabled) {
-  background: var(--accent);
-  color: var(--bg-primary);
+.submitBtn:hover:not(:disabled) {
+  background: var(--accent-hover);
   box-shadow: var(--accent-glow-subtle);
 }
 
-.actions button:disabled {
+.submitBtn:disabled {
   opacity: 0.7;
   cursor: not-allowed;
 }
 
-.cancel {
-  background: rgba(255, 255, 255, 0.05) !important;
-  border-color: var(--glass-border) !important;
-  color: var(--text-muted) !important;
+.cancelBtn {
+  padding: var(--space-sm) var(--space-lg);
+  background: #f0f0f0;
+  color: #333; /* Dark bold */
+  border: 1px solid #ccc;
+  border-radius: var(--radius-sm);
+  font-weight: 600;
+  cursor: pointer;
 }
 
-.cancel:hover {
-  background: rgba(255, 255, 255, 0.1) !important;
-  color: white !important;
+.cancelBtn:hover {
+  background: #e0e0e0;
 }
 
+/* Create button in header */
+.createBtn {
+  padding: var(--space-sm) var(--space-lg);
+  background: var(--accent); /* Dark bold color on light */
+  color: #ffffff;
+  border: none;
+  border-radius: var(--radius-sm);
+  font-weight: 700;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: all var(--transition-speed) var(--ease-out);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.createBtn:hover:not(:disabled) {
+  background: var(--accent-hover);
+  transform: translateY(-1px); /* Pixel polish */
+  box-shadow: var(--accent-glow-subtle);
+}
+
+.createBtn:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+/* List/table - light BG, dark text */
 .list {
-  background: rgba(255, 255, 255, 0.08);
-  border: 1px solid rgba(255, 255, 255, 0.15);
+  background: #ffffff;
+  border: 1px solid #e0e0e0;
   border-radius: var(--radius-lg);
   padding: var(--space-lg);
-  backdrop-filter: blur(12px);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
 }
 
 .list h3 {
   margin: 0 0 var(--space-md);
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #1a1a1a;
 }
 
 .category {
@@ -138,7 +304,8 @@
 .category h4 {
   margin: 0 0 var(--space-sm);
   font-size: 1rem;
-  color: var(--accent);
+  font-weight: 700; /* Bold */
+  color: #333;
   text-transform: uppercase;
   letter-spacing: 0.05em;
 }
@@ -151,24 +318,28 @@
 
 .table th,
 .table td {
-  padding: var(--space-sm);
+  padding: var(--space-sm) var(--space-md); /* Precise alignment */
   text-align: left;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  border-bottom: 1px solid #e0e0e0;
 }
 
 .table th {
-  color: var(--text-muted);
+  color: #333; /* Dark bold */
+  font-weight: 700;
   text-transform: uppercase;
   font-size: 0.8rem;
   letter-spacing: 0.05em;
+  background: #f5f5f5;
 }
 
 .table td code {
-  background: rgba(0, 0, 0, 0.2);
+  background: #f0f0f0;
   padding: 0.2em 0.4em;
   border-radius: var(--radius-sm);
   font-size: 0.85em;
-  font-family: monospace;
+  font-family: var(--font-mono);
+  color: #1a1a1a;
+  font-weight: 500;
 }
 
 .editBtn,
@@ -177,35 +348,67 @@
   border: none;
   border-radius: var(--radius-sm);
   font-size: 0.8rem;
+  font-weight: 600;
   cursor: pointer;
   margin-right: var(--space-xs);
+  transition: all var(--transition-speed);
 }
 
 .editBtn {
-  background: rgba(88, 101, 242, 0.2);
-  color: var(--accent);
+  background: #e0e7ff; /* Light */
+  color: #3730a3; /* Dark bold */
 }
 
 .editBtn:hover {
-  background: var(--accent);
-  color: var(--bg-primary);
+  background: #c7d2fe;
 }
 
 .deleteBtn {
-  background: rgba(239, 68, 68, 0.2);
-  color: #fca5a5;
+  background: #fee2e2;
+  color: #991b1b; /* Dark bold red */
 }
 
 .deleteBtn:hover {
-  background: #ef4444;
-  color: white;
+  background: #fecaca;
 }
 
+.empty {
+  text-align: center;
+  color: #666;
+  padding: var(--space-lg);
+}
+
+.empty button {
+  background: none;
+  border: none;
+  color: var(--accent);
+  font-weight: 600;
+  cursor: pointer;
+  text-decoration: underline;
+}
+
+/* Responsive for pixel-perfect on all sizes */
 @media (max-width: 768px) {
+  .header {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .headerActions {
+    margin-top: var(--space-md);
+  }
+  .filters {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .searchInput,
+  .filters select {
+    min-width: auto;
+  }
   .table {
     font-size: 0.8rem;
   }
-  .form {
-    grid-template-columns: 1fr;
+  .modal {
+    width: 95%;
+    margin: var(--space-md);
   }
 }
