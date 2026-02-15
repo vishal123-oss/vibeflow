@@ -1,6 +1,6 @@
 import { createContext, useContext, useReducer, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import apiClient from '../utils/api';
+import { authService } from '../services/authService';
 import { validateForm, validateRequired, validateUniqueId } from '../utils/validators';
 import { setStorage, getStorage, removeStorage } from '../utils/storage';
 
@@ -70,7 +70,7 @@ export function AuthProvider({ children }) {
   // fetchPermissions (RBAC UI only; gated by BE)
   const fetchPermissions = useCallback(async () => {
     try {
-      const { data } = await apiClient.get('/auth/permissions');
+      const { data } = await authService.getPermissions();
       dispatch({ type: AUTH_ACTIONS.SET_PERMISSIONS, payload: data });
       return data;
     } catch (err) {
@@ -79,21 +79,21 @@ export function AuthProvider({ children }) {
     }
   }, []);
 
-  // CRUD actions (super_admin only; uses apiClient)
+  // CRUD actions (super_admin only; uses service layer)
   const createPermission = useCallback(async (permData) => {
-    const { data } = await apiClient.post('/auth/permissions', permData);
+    const { data } = await authService.createPermission(permData);
     dispatch({ type: AUTH_ACTIONS.SET_PERMISSIONS, payload: [...state.permissions, data] });
     return data;
   }, [state.permissions]);
 
   const updatePermission = useCallback(async (permId, updates) => {
-    const { data } = await apiClient.patch(`/auth/permissions/${permId}`, updates);
+    const { data } = await authService.updatePermission(permId, updates);
     dispatch({ type: AUTH_ACTIONS.SET_PERMISSIONS, payload: state.permissions.map(p => p.id === permId ? { ...p, ...data } : p) });
     return data;
   }, [state.permissions]);
 
   const deletePermission = useCallback(async (permId) => {
-    await apiClient.delete(`/auth/permissions/${permId}`);
+    await authService.deletePermission(permId);
     dispatch({ type: AUTH_ACTIONS.SET_PERMISSIONS, payload: state.permissions.filter(p => p.id !== permId) });
   }, [state.permissions]);
 
@@ -102,13 +102,13 @@ export function AuthProvider({ children }) {
     // Validate
     const errors = validateForm({ email, password }, { email: { required: true, label: 'Email' }, password: { required: true, label: 'Password' } });
     if (Object.keys(errors).length > 0) throw new Error('Validation failed');
-    const { data } = await apiClient.post('/auth/login', { email, password });
+    const { data } = await authService.login({ email, password });
     const { user: u, accessToken: t } = data;
     setStorage('token', t);
     dispatch({ type: AUTH_ACTIONS.SET_TOKEN, payload: t });
     const rbacUser = getUserFromToken(t);
     dispatch({ type: AUTH_ACTIONS.SET_USER, payload: { ...u, ...rbacUser } });
-    const { data: allUsers } = await apiClient.get('/auth/users');
+    const { data: allUsers } = await authService.getUsers();
     dispatch({ type: AUTH_ACTIONS.SET_USERS, payload: allUsers });
     await fetchPermissions();
     return { ...u, ...rbacUser };
@@ -118,13 +118,13 @@ export function AuthProvider({ children }) {
   const signup = useCallback(async (userData) => {
     const errors = validateForm(userData, { email: { required: true }, password: { required: true } });
     if (Object.keys(errors).length > 0) throw new Error('Validation failed');
-    const { data } = await apiClient.post('/auth/signup', userData);
+    const { data } = await authService.signup(userData);
     const { user: u, accessToken: t } = data;
     setStorage('token', t);
     dispatch({ type: AUTH_ACTIONS.SET_TOKEN, payload: t });
     const rbacUser = getUserFromToken(t);
     dispatch({ type: AUTH_ACTIONS.SET_USER, payload: { ...u, ...rbacUser } });
-    const { data: allUsers } = await apiClient.get('/auth/users');
+    const { data: allUsers } = await authService.getUsers();
     dispatch({ type: AUTH_ACTIONS.SET_USERS, payload: allUsers });
     await fetchPermissions();
     return { ...u, ...rbacUser };
@@ -136,7 +136,7 @@ export function AuthProvider({ children }) {
     removeStorage('selectedWorkspaceId');
     dispatch({ type: AUTH_ACTIONS.LOGOUT });
     delete apiClient.defaults.headers.common.Authorization;
-    apiClient.post('/auth/logout').catch(() => {});
+    authService.logout().catch(() => {});
     navigate('/login');
   }, [navigate]);
 

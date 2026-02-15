@@ -1,4 +1,5 @@
 import axios from 'axios';
+import { getStorage } from './storage';
 
 /**
  * Prod API client (centralized axios; interceptor, base, error handling).
@@ -9,11 +10,12 @@ const API_BASE = '/api';
 const apiClient = axios.create({
   baseURL: API_BASE,
   timeout: 10000,
+  withCredentials: true, // For refresh cookie from BE
 });
 
-// Request interceptor for auth token (prod: central)
+// Request interceptor for auth token (prod: central; uses storage util)
 apiClient.interceptors.request.use((config) => {
-  const token = localStorage.getItem('token');
+  const token = getStorage('token'); // From utils/storage for prefix/safety
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;
   }
