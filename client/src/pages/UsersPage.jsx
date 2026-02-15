@@ -4,7 +4,6 @@ import { useAuth } from '../context/AuthContext';
 import { Button } from '../components/ui/Button';
 import { Modal } from '../components/ui/Modal';
 import { ConfirmModal } from '../components/ui/ConfirmModal';
-import { Select } from '../components/ui/Select';
 import styles from './UsersPage.module.css';
 
 // Roles from BE (for assign)
@@ -19,7 +18,7 @@ const initialForm = {
 };
 
 export function UsersPage() {
-  const { isSuperAdmin, users, fetchPermissions, createPermission, /* user CRUD via service in auth */ loading: authLoading } = useAuth(); // Extend with user actions from service
+  const { isSuperAdmin, users, fetchUsers, createUser, updateUser, deleteUser, loading: authLoading } = useAuth();
   const navigate = useNavigate();
 
   // State for CRUD/modal/confirm
@@ -38,6 +37,10 @@ export function UsersPage() {
       navigate('/');
     }
   }, [isSuperAdmin, authLoading, navigate]);
+
+  useEffect(() => {
+    if (isSuperAdmin) fetchUsers();
+  }, [isSuperAdmin, fetchUsers]);
 
   if (authLoading || !isSuperAdmin) {
     return <div className={styles.page}>Loading or access denied...</div>;
@@ -91,23 +94,36 @@ export function UsersPage() {
     setError('');
     try {
       if (editingId) {
-        // Update user (BE via service)
-        // Assign role update
-        // (extend if BE supports full patch)
+        const updates = {
+          firstName: form.firstName.trim(),
+          lastName: form.lastName.trim(),
+          role: form.role,
+        };
+        if (form.password.trim()) updates.password = form.password;
+        await updateUser(editingId, updates);
       } else {
-        // Create user (signup like)
+        await createUser({
+          email: form.email.trim(),
+          firstName: form.firstName.trim(),
+          lastName: form.lastName.trim(),
+          role: form.role,
+          password: form.password,
+        });
       }
       closeModal();
     } catch (err) {
-      setError(err.message);
+      setError(err.response?.data?.message || err.message || 'Operation failed');
     } finally {
       setSubmitting(false);
     }
   };
 
-  const handleAssignRole = async (userId, role) => {
-    // Update user role (BE)
-    // Super_admin assign
+  const handleAssignRole = async (userId, newRole) => {
+    try {
+      await updateUser(userId, { role: newRole });
+    } catch (err) {
+      setError(err.response?.data?.message || err.message || 'Failed to update role');
+    }
   };
 
   const openDeleteConfirm = (user) => {
@@ -116,9 +132,13 @@ export function UsersPage() {
   };
 
   const handleDelete = async () => {
-    if (userToDelete) {
-      // Delete user (BE)
+    if (!userToDelete) return;
+    try {
+      await deleteUser(userToDelete.id);
       setIsConfirmOpen(false);
+      setUserToDelete(null);
+    } catch (err) {
+      setError(err.response?.data?.message || err.message || 'Delete failed');
     }
   };
 
@@ -156,11 +176,15 @@ export function UsersPage() {
                 <td>{u.firstName} {u.lastName}</td>
                 <td>{u.role}</td>
                 <td>
-                  <Select
+                  <select
                     value={u.role}
-                    options={ROLES.map(r => ({ value: r, label: r }))}
                     onChange={(e) => handleAssignRole(u.id, e.target.value)}
-                  />
+                    className={styles.roleSelect}
+                  >
+                    {ROLES.map((r) => (
+                      <option key={r} value={r}>{r}</option>
+                    ))}
+                  </select>
                 </td>
                 <td>
                   <Button onClick={() => openModal(u)} className={styles.editBtn}>Edit</Button>
@@ -175,12 +199,73 @@ export function UsersPage() {
       {/* Modal for create/edit user */}
       <Modal isOpen={isModalOpen} onClose={closeModal} title={editingId ? 'Edit User' : 'Create User'}>
         <form onSubmit={handleSubmit} className={styles.modalForm}>
-          <input type="email" placeholder="Email" value={form.email} onChange={handleChange('email')} required />
-          {/* Fields , role select , password */}
-          {/* Validation errors */}
+          <div className={styles.field}>
+            <label>Email</label>
+            <input
+              type="email"
+              placeholder="Email"
+              value={form.email}
+              onChange={handleChange('email')}
+              disabled={!!editingId}
+              className={fieldErrors.email ? styles.inputError : ''}
+            />
+            {fieldErrors.email && <span className={styles.fieldError}>{fieldErrors.email}</span>}
+          </div>
+          <div className={styles.field}>
+            <label>First name</label>
+            <input
+              placeholder="First name"
+              value={form.firstName}
+              onChange={handleChange('firstName')}
+              className={fieldErrors.firstName ? styles.inputError : ''}
+            />
+            {fieldErrors.firstName && <span className={styles.fieldError}>{fieldErrors.firstName}</span>}
+          </div>
+          <div className={styles.field}>
+            <label>Last name</label>
+            <input
+              placeholder="Last name"
+              value={form.lastName}
+              onChange={handleChange('lastName')}
+              className={fieldErrors.lastName ? styles.inputError : ''}
+            />
+            {fieldErrors.lastName && <span className={styles.fieldError}>{fieldErrors.lastName}</span>}
+          </div>
+          <div className={styles.field}>
+            <label>Role</label>
+            <select value={form.role} onChange={handleChange('role')}>
+              {ROLES.map((r) => (
+                <option key={r} value={r}>{r}</option>
+              ))}
+            </select>
+          </div>
+          {!editingId && (
+            <div className={styles.field}>
+              <label>Password</label>
+              <input
+                type="password"
+                placeholder="Password"
+                value={form.password}
+                onChange={handleChange('password')}
+                className={fieldErrors.password ? styles.inputError : ''}
+              />
+              {fieldErrors.password && <span className={styles.fieldError}>{fieldErrors.password}</span>}
+            </div>
+          )}
+          {editingId && (
+            <div className={styles.field}>
+              <label>New password (leave blank to keep)</label>
+              <input
+                type="password"
+                placeholder="New password"
+                value={form.password}
+                onChange={handleChange('password')}
+              />
+            </div>
+          )}
           <div className={styles.modalActions}>
             <Button type="submit" disabled={submitting}>Save</Button>
-            <Button onClick={closeModal} variant="secondary">Cancel</Button>
+            <Button type="button" onClick={closeModal} variant="secondary">Cancel</Button>
           </div>
         </form>
       </Modal>

@@ -50,10 +50,10 @@ export function PermissionsPage() {
   // Redirect non-super_admin (UI only for super admin as per task; backend also guards)
   // super_admin is the only role with permissions:crud + roles:crud from data/roles/super_admin.json
   useEffect(() => {
-    if (!authLoading && !isSuperAdmin) {
+    if ( !isSuperAdmin) {
       navigate('/'); // redirect to boards; UI hidden
     }
-  }, [isSuperAdmin, authLoading, navigate]);
+  }, [isSuperAdmin, navigate]);
 
   // Refresh list (e.g., after CRUD ops)
   useEffect(() => {
@@ -71,8 +71,8 @@ export function PermissionsPage() {
     return () => document.removeEventListener('keydown', handleEsc);
   }, [isModalOpen]);
 
-  if (authLoading || !isSuperAdmin) {
-    return <div className={styles.page}>Loading or access denied...</div>;
+  if (!isSuperAdmin) {
+    return <div className={styles.page}>Access denied...</div>;
   }
 
   // Validation for form fields (proper checks: required, unique ID for create, length etc.)

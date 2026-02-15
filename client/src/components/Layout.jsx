@@ -38,17 +38,34 @@ export function Layout() {
               >
                 Tasks
               </NavLink>
-              {/* Super admin only nav link for permissions CRUD UI */}
-              {/* Hidden for other roles; visible @ /permissions; aligns with RBAC structure */}
+              {/* Super admin only: Users, Roles, Permissions CRUD (visible only to super_admin) */}
               {isSuperAdmin && (
-                <NavLink
-                  to="/permissions"
-                  className={({ isActive }) =>
-                    `${styles.navLink} ${isActive ? styles.activeLink : ''}`.trim()
-                  }
-                >
-                  Permissions
-                </NavLink>
+                <>
+                  <NavLink
+                    to="/users"
+                    className={({ isActive }) =>
+                      `${styles.navLink} ${isActive ? styles.activeLink : ''}`.trim()
+                    }
+                  >
+                    Users
+                  </NavLink>
+                  <NavLink
+                    to="/roles"
+                    className={({ isActive }) =>
+                      `${styles.navLink} ${isActive ? styles.activeLink : ''}`.trim()
+                    }
+                  >
+                    Roles
+                  </NavLink>
+                  <NavLink
+                    to="/permissions"
+                    className={({ isActive }) =>
+                      `${styles.navLink} ${isActive ? styles.activeLink : ''}`.trim()
+                    }
+                  >
+                    Permissions
+                  </NavLink>
+                </>
               )}
             </nav>
             {user && (

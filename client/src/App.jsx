@@ -9,6 +9,8 @@ import { TasksPage } from './pages/TasksPage';
 import { WorkspaceSelectPage } from './pages/WorkspaceSelectPage';
 import LoginPage from './pages/LoginPage';
 import { PermissionsPage } from './pages/PermissionsPage'; // Super admin only RBAC UI for permissions CRUD
+import { UsersPage } from './pages/UsersPage';
+import { RolesPage } from './pages/RolesPage';
 
 export default function App() {
   return (
@@ -23,8 +25,9 @@ export default function App() {
                 <Route index element={<BoardsPage />} />
                 <Route path="tasks" element={<TasksPage />} />
                 <Route path="boards/:boardId" element={<BoardPage />} />
-                {/* Super admin only: Permissions management UI (CRUD for data/permissions/ FS DB) */}
-                {/* Gated by isSuperAdmin from AuthContext (role='super_admin' + perms:crud) */}
+                {/* Super admin only: Users, Roles, Permissions CRUD */}
+                <Route path="users" element={<UsersPage />} />
+                <Route path="roles" element={<RolesPage />} />
                 <Route path="permissions" element={<PermissionsPage />} />
               </Route>
             </Routes>

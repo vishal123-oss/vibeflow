@@ -13,6 +13,7 @@ const AUTH_ACTIONS = {
   SET_USER: 'SET_USER',
   SET_USERS: 'SET_USERS',
   SET_PERMISSIONS: 'SET_PERMISSIONS',
+  SET_ROLES: 'SET_ROLES',
   SET_TOKEN: 'SET_TOKEN',
   SET_ERROR: 'SET_ERROR',
   LOGOUT: 'LOGOUT',
@@ -30,6 +31,8 @@ function authReducer(state, action) {
       return { ...state, users: action.payload };
     case AUTH_ACTIONS.SET_PERMISSIONS:
       return { ...state, permissions: action.payload };
+    case AUTH_ACTIONS.SET_ROLES:
+      return { ...state, roles: action.payload };
     case AUTH_ACTIONS.SET_TOKEN:
       return { ...state, token: action.payload };
     case AUTH_ACTIONS.SET_ERROR:
@@ -37,36 +40,56 @@ function authReducer(state, action) {
     case AUTH_ACTIONS.REFRESH_USER:
       return { ...state, user: action.payload };
     case AUTH_ACTIONS.LOGOUT:
-      return { user: null, users: [], permissions: [], token: null, loading: false, error: null };
+      return { user: null, users: [], permissions: [], roles: [], token: null, loading: false, error: null };
     default:
       return state;
   }
 }
 
-const initialState = {
-  user: null,
-  users: [],
-  permissions: [],
-  token: getStorage('token'),
-  loading: true,
-  error: null,
-};
-
-// Helper (relevant: RBAC token decode only; no excess)
-const getUserFromToken = (token) => {
+// Decode JWT payload (no verify; client-side role/email only for UI)
+function decodeTokenPayload(token) {
   if (!token) return null;
   try {
-    return JSON.parse(atob(token.split('.')[1]));
+    const raw = typeof token === 'string' ? token : (token && token.accessToken);
+    const str = typeof raw === 'string' ? raw : '';
+    const payload = str.split('.')[1];
+    return payload ? JSON.parse(atob(payload)) : null;
   } catch {
     return null;
   }
-};
+}
+
+const AUTH_STORAGE_KEY_USER = 'user';
+
+// Restore user from storage (only cleared on logout); fallback to decoding token
+function getInitialState() {
+  const token = getStorage('token');
+  // Prefer persisted user so refresh keeps state.user (remove only on logout)
+  let user = getStorage(AUTH_STORAGE_KEY_USER);
+  if (!user || !(user.id || user.email || user.role)) {
+    user = decodeTokenPayload(token);
+    user = user && (user.id || user.email || user.role) ? user : null;
+  }
+  return {
+    user,
+    users: [],
+    permissions: [],
+    roles: [],
+    token,
+    loading: false, // never start as true so authLoading is not stuck
+    error: null,
+  };
+}
 
 export function AuthProvider({ children }) {
-  const [state, dispatch] = useReducer(authReducer, initialState);
+  // Lazy init so initial state is computed when reducer mounts (correct storage read)
+  const [state, dispatch] = useReducer(authReducer, undefined, getInitialState);
   const navigate = useNavigate();
 
-  const isSuperAdmin = state.user?.role === 'super_admin';
+  // Super admin: by role from token, or by known super admin email (fallback if role missing in payload)
+  const isSuperAdmin =
+    state.user?.role === 'super_admin' ||
+    (state.user?.email && state.user.email.toLowerCase() === 'superadmin@vibeflow.com');
 
   // fetchPermissions (RBAC UI only; gated by BE)
   const fetchPermissions = useCallback(async () => {
@@ -98,22 +121,103 @@ export function AuthProvider({ children }) {
     dispatch({ type: AUTH_ACTIONS.SET_PERMISSIONS, payload: state.permissions.filter(p => p.id !== permId) });
   }, [state.permissions]);
 
+  // fetchUsers (refresh list after CRUD)
+  const fetchUsers = useCallback(async () => {
+    try {
+      const { data } = await authService.getUsers();
+      dispatch({ type: AUTH_ACTIONS.SET_USERS, payload: data });
+      return data;
+    } catch (err) {
+      console.error('Users fetch failed');
+      return [];
+    }
+  }, []);
+
+  const createUser = useCallback(async (userData) => {
+    const { data } = await authService.createUser(userData);
+    await fetchUsers();
+    return data;
+  }, [fetchUsers]);
+
+  const updateUser = useCallback(async (userId, updates) => {
+    const { data } = await authService.updateUser(userId, updates);
+    await fetchUsers();
+    return data;
+  }, [fetchUsers]);
+
+  const deleteUser = useCallback(async (userId) => {
+    await authService.deleteUser(userId);
+    await fetchUsers();
+  }, [fetchUsers]);
+
+  // Roles (super_admin only)
+  const fetchRoles = useCallback(async () => {
+    try {
+      const { data } = await authService.getRoles();
+      dispatch({ type: AUTH_ACTIONS.SET_ROLES, payload: data });
+      return data;
+    } catch (err) {
+      console.error('Roles fetch failed');
+      return [];
+    }
+  }, []);
+
+  const createRole = useCallback(async (roleData) => {
+    const { data } = await authService.createRole(roleData);
+    dispatch({ type: AUTH_ACTIONS.SET_ROLES, payload: [...(state.roles || []), data] });
+    return data;
+  }, [state.roles]);
+
+  const updateRole = useCallback(async (roleId, updates) => {
+    const { data } = await authService.updateRole(roleId, updates);
+    dispatch({ type: AUTH_ACTIONS.SET_ROLES, payload: (state.roles || []).map(r => r.id === roleId ? { ...r, ...data } : r) });
+    return data;
+  }, [state.roles]);
+
+  const deleteRole = useCallback(async (roleId) => {
+    await authService.deleteRole(roleId);
+    dispatch({ type: AUTH_ACTIONS.SET_ROLES, payload: (state.roles || []).filter(r => r.id !== roleId) });
+  }, [state.roles]);
+
+  // On mount: re-sync user from storage/token and ensure loading is false
+  useEffect(() => {
+    const token = getStorage('token');
+    const storedUser = getStorage(AUTH_STORAGE_KEY_USER);
+    if (storedUser && (storedUser.id || storedUser.email || storedUser.role)) {
+      dispatch({ type: AUTH_ACTIONS.SET_USER, payload: storedUser });
+    } else if (token) {
+      const payload = decodeTokenPayload(token);
+      if (payload && (payload.id || payload.email || payload.role)) {
+        dispatch({ type: AUTH_ACTIONS.SET_USER, payload });
+        setStorage(AUTH_STORAGE_KEY_USER, payload);
+      }
+    }
+    if (apiClient.defaults?.headers?.common && token) {
+      const t = typeof token === 'string' ? token : (token?.accessToken ?? token);
+      if (t) apiClient.defaults.headers.common.Authorization = `Bearer ${t}`;
+    }
+    dispatch({ type: AUTH_ACTIONS.SET_LOADING, payload: false });
+  }, []);
+
   // login action (with validation + RBAC merge)
   const login = useCallback(async (email, password) => {
-    // Validate
     const errors = validateForm({ email, password }, { email: { required: true, label: 'Email' }, password: { required: true, label: 'Password' } });
     if (Object.keys(errors).length > 0) throw new Error('Validation failed');
     const { data } = await authService.login({ email, password });
     const { user: u, accessToken: t } = data;
     setStorage('token', t);
     dispatch({ type: AUTH_ACTIONS.SET_TOKEN, payload: t });
-    const rbacUser = getUserFromToken(t);
-    dispatch({ type: AUTH_ACTIONS.SET_USER, payload: { ...u, ...rbacUser } });
+    const rbacUser = decodeTokenPayload(t);
+    const mergedUser = { ...u, ...rbacUser };
+    dispatch({ type: AUTH_ACTIONS.SET_USER, payload: mergedUser });
+    setStorage(AUTH_STORAGE_KEY_USER, mergedUser);
+    dispatch({ type: AUTH_ACTIONS.SET_LOADING, payload: false });
     const { data: allUsers } = await authService.getUsers();
     dispatch({ type: AUTH_ACTIONS.SET_USERS, payload: allUsers });
     await fetchPermissions();
-    return { ...u, ...rbacUser };
-  }, [fetchPermissions]);
+    await fetchRoles();
+    return mergedUser;
+  }, [fetchPermissions, fetchRoles]);
 
   // signup action (similar flow)
   const signup = useCallback(async (userData) => {
@@ -123,17 +227,22 @@ export function AuthProvider({ children }) {
     const { user: u, accessToken: t } = data;
     setStorage('token', t);
     dispatch({ type: AUTH_ACTIONS.SET_TOKEN, payload: t });
-    const rbacUser = getUserFromToken(t);
-    dispatch({ type: AUTH_ACTIONS.SET_USER, payload: { ...u, ...rbacUser } });
+    const rbacUser = decodeTokenPayload(t);
+    const mergedUser = { ...u, ...rbacUser };
+    dispatch({ type: AUTH_ACTIONS.SET_USER, payload: mergedUser });
+    setStorage(AUTH_STORAGE_KEY_USER, mergedUser);
+    dispatch({ type: AUTH_ACTIONS.SET_LOADING, payload: false });
     const { data: allUsers } = await authService.getUsers();
     dispatch({ type: AUTH_ACTIONS.SET_USERS, payload: allUsers });
     await fetchPermissions();
-    return { ...u, ...rbacUser };
-  }, [fetchPermissions]);
+    await fetchRoles();
+    return mergedUser;
+  }, [fetchPermissions, fetchRoles]);
 
-  // logout action
+  // logout action – only place we clear auth storage (token + user)
   const logout = useCallback(() => {
     removeStorage('token');
+    removeStorage(AUTH_STORAGE_KEY_USER);
     removeStorage('selectedWorkspaceId');
     dispatch({ type: AUTH_ACTIONS.LOGOUT });
     delete apiClient.defaults.headers.common.Authorization;
@@ -154,8 +263,11 @@ export function AuthProvider({ children }) {
             const newToken = data.accessToken;
             setStorage('token', newToken);
             dispatch({ type: AUTH_ACTIONS.SET_TOKEN, payload: newToken });
-            const rbacUser = getUserFromToken(newToken);
-            if (rbacUser) dispatch({ type: AUTH_ACTIONS.REFRESH_USER, payload: rbacUser });
+            const rbacUser = decodeTokenPayload(newToken);
+            if (rbacUser) {
+              dispatch({ type: AUTH_ACTIONS.REFRESH_USER, payload: rbacUser });
+              setStorage(AUTH_STORAGE_KEY_USER, rbacUser);
+            }
             apiClient.defaults.headers.common.Authorization = `Bearer ${newToken}`;
             originalRequest.headers.Authorization = `Bearer ${newToken}`;
             return apiClient(originalRequest);
@@ -176,6 +288,7 @@ export function AuthProvider({ children }) {
       user: state.user,
       users: state.users,
       permissions: state.permissions,
+      roles: state.roles || [],
       token: state.token,
       loading: state.loading,
       error: state.error,
@@ -188,7 +301,15 @@ export function AuthProvider({ children }) {
       fetchPermissions,
       createPermission,
       updatePermission,
-      deletePermission
+      deletePermission,
+      fetchUsers,
+      createUser,
+      updateUser,
+      deleteUser,
+      fetchRoles,
+      createRole,
+      updateRole,
+      deleteRole
     }}>
       {children}
     </AuthContext.Provider>

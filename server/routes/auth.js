@@ -108,7 +108,59 @@ router.post('/logout', (req, res) => {
 // Perm string matches DB entity key (no constants outside data/)
 router.get('/users', authenticateToken, authorizePermission('users:read'), asyncHandler(async (req, res) => {
   const users = await usersStore.getUsers();
-  res.json(users);
+  res.json(users.map(u => ({ ...u, password: undefined, hashedPassword: undefined })));
+}));
+
+// Users CRUD (super_admin only) - create, update, delete
+router.post('/users', authenticateToken, authorizeSuperAdmin(), asyncHandler(async (req, res) => {
+  validateUserPayload(req.body);
+  const { email, password, firstName, lastName, role = 'user', address = '', bio = '' } = req.body;
+  const existing = await usersStore.getUserByEmail(email);
+  if (existing) {
+    const err = new Error('User already exists');
+    err.status = StatusCodes.CONFLICT;
+    throw err;
+  }
+  const hashedPassword = await bcrypt.hash(password, AuthConstants.SALT_ROUNDS);
+  const user = await usersStore.createUser({
+    email,
+    password,
+    hashedPassword,
+    firstName,
+    lastName,
+    role,
+    address,
+    bio,
+    initials: `${firstName?.[0] || ''}${lastName?.[0] || ''}`.toUpperCase(),
+  });
+  res.status(StatusCodes.CREATED).json({ ...user, password: undefined, hashedPassword: undefined });
+}));
+router.patch('/users/:userId', authenticateToken, authorizeSuperAdmin(), asyncHandler(async (req, res) => {
+  const { userId } = req.params;
+  const payload = { ...req.body };
+  if (payload.password) {
+    payload.hashedPassword = await bcrypt.hash(payload.password, AuthConstants.SALT_ROUNDS);
+    delete payload.password;
+  }
+  delete payload.id;
+  delete payload.email; // optional: disallow email change to avoid dupes
+  const user = await usersStore.updateUser(userId, payload);
+  if (!user) {
+    const err = new Error('User not found');
+    err.status = StatusCodes.NOT_FOUND;
+    throw err;
+  }
+  res.json({ ...user, password: undefined, hashedPassword: undefined });
+}));
+router.delete('/users/:userId', authenticateToken, authorizeSuperAdmin(), asyncHandler(async (req, res) => {
+  const existing = await usersStore.getUserById(req.params.userId);
+  if (!existing) {
+    const err = new Error('User not found');
+    err.status = StatusCodes.NOT_FOUND;
+    throw err;
+  }
+  await usersStore.deleteUser(req.params.userId);
+  res.status(StatusCodes.NO_CONTENT).send();
 }));
 
 // RBAC mgmt APIs (/roles, /permissions) - strict: SuperAdmin only for CRUD (global top-level)
