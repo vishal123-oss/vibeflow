@@ -1,0 +1,14 @@
+/* Styles for ConfirmModal (minimal, reuses Modal; prod consistency for actions) */
+
+.message {
+  margin: 0 0 var(--space-md);
+  color: #333;
+  font-size: 0.95rem;
+}
+
+.actions {
+  display: flex;
+  gap: var(--space-sm);
+  justify-content: flex-end;
+  margin-top: var(--space-md);
+}

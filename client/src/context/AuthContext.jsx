@@ -1,140 +1,163 @@
-import { createContext, useContext, useState, useEffect } from 'react';
-import axios from 'axios';
+import { createContext, useContext, useReducer, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
+import apiClient from '../utils/api';
+import { validateForm, validateRequired, validateUniqueId } from '../utils/validators';
+import { setStorage, getStorage, removeStorage } from '../utils/storage';
 
 const AuthContext = createContext();
 
-const API = '/api/auth';
+// Action types (prod: constant for reducer; avoids string typos)
+const AUTH_ACTIONS = {
+  SET_LOADING: 'SET_LOADING',
+  SET_USER: 'SET_USER',
+  SET_USERS: 'SET_USERS',
+  SET_PERMISSIONS: 'SET_PERMISSIONS',
+  SET_TOKEN: 'SET_TOKEN',
+  SET_ERROR: 'SET_ERROR',
+  LOGOUT: 'LOGOUT',
+  REFRESH_USER: 'REFRESH_USER',
+};
 
-// Helper to extract RBAC payload from token (includes role + permissions array from backend FS DB)
+// Reducer for state management (prod: predictable, scalable flow; replaces scattered setState)
+function authReducer(state, action) {
+  switch (action.type) {
+    case AUTH_ACTIONS.SET_LOADING:
+      return { ...state, loading: action.payload };
+    case AUTH_ACTIONS.SET_USER:
+      return { ...state, user: action.payload };
+    case AUTH_ACTIONS.SET_USERS:
+      return { ...state, users: action.payload };
+    case AUTH_ACTIONS.SET_PERMISSIONS:
+      return { ...state, permissions: action.payload };
+    case AUTH_ACTIONS.SET_TOKEN:
+      return { ...state, token: action.payload };
+    case AUTH_ACTIONS.SET_ERROR:
+      return { ...state, error: action.payload };
+    case AUTH_ACTIONS.REFRESH_USER:
+      return { ...state, user: action.payload };
+    case AUTH_ACTIONS.LOGOUT:
+      return { user: null, users: [], permissions: [], token: null, loading: false, error: null };
+    default:
+      return state;
+  }
+}
+
+const initialState = {
+  user: null,
+  users: [],
+  permissions: [],
+  token: getStorage('token'),
+  loading: true,
+  error: null,
+};
+
+// Helper (relevant: RBAC token decode only; no excess)
 const getUserFromToken = (token) => {
   if (!token) return null;
   try {
-    const decoded = JSON.parse(atob(token.split('.')[1]));
-    return decoded; // {id, email, role, permissions: [...]}
+    return JSON.parse(atob(token.split('.')[1]));
   } catch {
     return null;
   }
 };
 
 export function AuthProvider({ children }) {
-  const [user, setUser] = useState(null);
-  const [users, setUsers] = useState([]); // All users for backend-driven UI (dropdowns etc)
-  const [permissions, setPermissions] = useState([]); // All permissions for super_admin RBAC UI (from /api/auth/permissions FS DB)
-  const [token, setToken] = useState(localStorage.getItem('token'));
-  const [loading, setLoading] = useState(true);
+  const [state, dispatch] = useReducer(authReducer, initialState);
   const navigate = useNavigate();
 
-  // Computed: only super_admin can manage global RBAC (roles/perms); matches backend authorizeSuperAdmin
-  const isSuperAdmin = user?.role === 'super_admin';
+  const isSuperAdmin = state.user?.role === 'super_admin';
 
-  // RBAC helper: fetch full permissions list from backend FS DB (data/permissions/*.json via permStore.getPermissions())
-  // Used for super_admin UI; read gated by permissions:read (most roles have it per roles/*.json)
-  const fetchPermissions = async () => {
+  // fetchPermissions (RBAC UI only; gated by BE)
+  const fetchPermissions = useCallback(async () => {
     try {
-      const { data } = await axios.get(`${API}/permissions`);
-      setPermissions(data);
+      const { data } = await apiClient.get('/auth/permissions');
+      dispatch({ type: AUTH_ACTIONS.SET_PERMISSIONS, payload: data });
       return data;
     } catch (err) {
-      console.error('Failed to fetch permissions:', err);
-      // Non-super may 403? but read allowed for auth users; silent for UI
+      console.error('Permissions fetch failed');
       return [];
     }
-  };
+  }, []);
 
-  // CRUD for permissions - only super_admin (enforced by backend: authorizeSuperAdmin() + 'permissions:crud')
-  // This integrates FE/BE: ops hit /api/auth/permissions which uses storage/saveRecord on data/permissions/ FS entities
-  // Matches task: CRUD UI only for super admin
-  const createPermission = async (permData) => {
-    // permData: {name, description, category?, ...}; backend auto id if missing (id('perm') in helpers)
-    // e.g., {name: 'boards:delete', description: 'Delete boards', category: 'boards'}
-    const { data } = await axios.post(`${API}/permissions`, permData);
-    setPermissions(prev => [...prev, data]);
+  // CRUD actions (super_admin only; uses apiClient)
+  const createPermission = useCallback(async (permData) => {
+    const { data } = await apiClient.post('/auth/permissions', permData);
+    dispatch({ type: AUTH_ACTIONS.SET_PERMISSIONS, payload: [...state.permissions, data] });
     return data;
-  };
+  }, [state.permissions]);
 
-  const updatePermission = async (permId, updates) => {
-    // e.g., updates: {description: 'new desc'}
-    const { data } = await axios.patch(`${API}/permissions/${permId}`, updates);
-    setPermissions(prev => prev.map(p => p.id === permId ? { ...p, ...data } : p));
+  const updatePermission = useCallback(async (permId, updates) => {
+    const { data } = await apiClient.patch(`/auth/permissions/${permId}`, updates);
+    dispatch({ type: AUTH_ACTIONS.SET_PERMISSIONS, payload: state.permissions.map(p => p.id === permId ? { ...p, ...data } : p) });
     return data;
-  };
+  }, [state.permissions]);
 
-  const deletePermission = async (permId) => {
-    await axios.delete(`${API}/permissions/${permId}`);
-    setPermissions(prev => prev.filter(p => p.id !== permId));
-  };
+  const deletePermission = useCallback(async (permId) => {
+    await apiClient.delete(`/auth/permissions/${permId}`);
+    dispatch({ type: AUTH_ACTIONS.SET_PERMISSIONS, payload: state.permissions.filter(p => p.id !== permId) });
+  }, [state.permissions]);
 
-  // Updated login: set full user = store + RBAC token payload (ensures .role + .permissions[] always)
-  // + refresh perms list; fixes inconsistency (store.user lacks perms, token does)
-  // Backend: createAuthTokens embeds from rolesStore.getPermissionsForRole (FS DB)
-  const login = async (email, password) => {
-    const { data } = await axios.post(`${API}/login`, { email, password });
+  // login action (with validation + RBAC merge)
+  const login = useCallback(async (email, password) => {
+    // Validate
+    const errors = validateForm({ email, password }, { email: { required: true, label: 'Email' }, password: { required: true, label: 'Password' } });
+    if (Object.keys(errors).length > 0) throw new Error('Validation failed');
+    const { data } = await apiClient.post('/auth/login', { email, password });
     const { user: u, accessToken: t } = data;
-    localStorage.setItem('token', t);
-    setToken(t);
-    // Merge for complete user (incl. RBAC perms array)
+    setStorage('token', t);
+    dispatch({ type: AUTH_ACTIONS.SET_TOKEN, payload: t });
     const rbacUser = getUserFromToken(t);
-    setUser({ ...u, ...rbacUser });
-    axios.defaults.headers.common['Authorization'] = `Bearer ${t}`;
-    // Refresh lists for UI
-    const { data: allUsers } = await axios.get(`${API}/users`);
-    setUsers(allUsers);
+    dispatch({ type: AUTH_ACTIONS.SET_USER, payload: { ...u, ...rbacUser } });
+    const { data: allUsers } = await apiClient.get('/auth/users');
+    dispatch({ type: AUTH_ACTIONS.SET_USERS, payload: allUsers });
     await fetchPermissions();
     return { ...u, ...rbacUser };
-  };
+  }, [fetchPermissions]);
 
-  const signup = async (userData) => {
-    const { data } = await axios.post(`${API}/signup`, userData);
+  // signup action (similar flow)
+  const signup = useCallback(async (userData) => {
+    const errors = validateForm(userData, { email: { required: true }, password: { required: true } });
+    if (Object.keys(errors).length > 0) throw new Error('Validation failed');
+    const { data } = await apiClient.post('/auth/signup', userData);
     const { user: u, accessToken: t } = data;
-    localStorage.setItem('token', t);
-    setToken(t);
-    // Merge for RBAC consistency
+    setStorage('token', t);
+    dispatch({ type: AUTH_ACTIONS.SET_TOKEN, payload: t });
     const rbacUser = getUserFromToken(t);
-    setUser({ ...u, ...rbacUser });
-    axios.defaults.headers.common['Authorization'] = `Bearer ${t}`;
-    // Refresh lists
-    const { data: allUsers } = await axios.get(`${API}/users`);
-    setUsers(allUsers);
+    dispatch({ type: AUTH_ACTIONS.SET_USER, payload: { ...u, ...rbacUser } });
+    const { data: allUsers } = await apiClient.get('/auth/users');
+    dispatch({ type: AUTH_ACTIONS.SET_USERS, payload: allUsers });
     await fetchPermissions();
     return { ...u, ...rbacUser };
-  };
+  }, [fetchPermissions]);
 
-  // Logout clears all auth/RBAC state
-  const logout = () => {
-    localStorage.removeItem('token');
-    localStorage.removeItem('selectedWorkspaceId');
-    setToken(null);
-    setUser(null);
-    setUsers([]);
-    setPermissions([]); // Clear RBAC data
-    delete axios.defaults.headers.common['Authorization'];
-    // Call backend logout to clear cookie
-    axios.post(`${API}/logout`).catch(() => {});
+  // logout action
+  const logout = useCallback(() => {
+    removeStorage('token');
+    removeStorage('selectedWorkspaceId');
+    dispatch({ type: AUTH_ACTIONS.LOGOUT });
+    delete apiClient.defaults.headers.common.Authorization;
+    apiClient.post('/auth/logout').catch(() => {});
     navigate('/login');
-  };
+  }, [navigate]);
 
-  // Axios interceptor for auto refresh on 401
-  // Note: refresh also updates RBAC payload (role/perms) in new token from backend FS DB
-  // Depends on logout for failure case
+  // Refresh effect (uses dispatch)
   useEffect(() => {
-    const interceptor = axios.interceptors.response.use(
+    const interceptor = apiClient.interceptors.response.use(
       (response) => response,
       async (error) => {
         const originalRequest = error.config;
         if (error.response?.status === 401 && !originalRequest._retry) {
           originalRequest._retry = true;
           try {
-            const { data } = await axios.post(`${API}/refresh`);
+            const { data } = await apiClient.post('/auth/refresh');
             const newToken = data.accessToken;
-            localStorage.setItem('token', newToken);
-            setToken(newToken);
-            // Update user with fresh RBAC payload (role + permissions)
+            setStorage('token', newToken);
+            dispatch({ type: AUTH_ACTIONS.SET_TOKEN, payload: newToken });
             const rbacUser = getUserFromToken(newToken);
-            if (rbacUser) setUser(rbacUser);
-            axios.defaults.headers.common['Authorization'] = `Bearer ${newToken}`;
-            originalRequest.headers['Authorization'] = `Bearer ${newToken}`;
-            return axios(originalRequest);
+            if (rbacUser) dispatch({ type: AUTH_ACTIONS.REFRESH_USER, payload: rbacUser });
+            apiClient.defaults.headers.common.Authorization = `Bearer ${newToken}`;
+            originalRequest.headers.Authorization = `Bearer ${newToken}`;
+            return apiClient(originalRequest);
           } catch (refreshErr) {
             logout();
             return Promise.reject(refreshErr);
@@ -143,48 +166,21 @@ export function AuthProvider({ children }) {
         return Promise.reject(error);
       }
     );
-    return () => axios.interceptors.response.eject(interceptor);
-  }, []);  // Note: logout/navigate stable; ok for interceptor
-
-  // Load user + all users/permissions from backend on mount
-  // Integrates RBAC: user=token payload (role + permissions[] from FS DB); full perms list for super_admin UI
-  // permissions:read allowed for auth users per roles DB; CRUD UI gated by isSuperAdmin in components
-  // Depends on: logout, fetchPermissions (now declared above)
-  useEffect(() => {
-    const loadAuth = async () => {
-      const storedToken = localStorage.getItem('token');
-      if (storedToken) {
-        try {
-          // Always use RBAC payload from token for consistent role/perms
-          const rbacUser = getUserFromToken(storedToken);
-          setUser(rbacUser);
-          setToken(storedToken);
-          axios.defaults.headers.common['Authorization'] = `Bearer ${storedToken}`;
-          // Fetch all users for UI
-          const { data: allUsers } = await axios.get(`${API}/users`);
-          setUsers(allUsers);
-          // Fetch full permissions list (for super_admin CRUD UI)
-          // Backend context: permStore.getPermissions() -> getAllRecords('permissions')
-          await fetchPermissions();
-        } catch (err) {
-          logout();
-        }
-      }
-      setLoading(false);
-    };
-    loadAuth();
-  }, []);
+    return () => apiClient.interceptors.response.eject(interceptor);
+  }, [logout]);
 
   return (
-    // Expose RBAC: isSuperAdmin (for UI visibility), permissions (full list), + CRUD fns
-    // Aligns with backend: super_admin only for perms CRUD; token perms[] for guards
     <AuthContext.Provider value={{ 
-      user, 
-      users, 
-      permissions, 
-      token, 
-      loading, 
+      // State
+      user: state.user,
+      users: state.users,
+      permissions: state.permissions,
+      token: state.token,
+      loading: state.loading,
+      error: state.error,
+      // Computed
       isSuperAdmin,
+      // Actions (dispatcher flow)
       login, 
       signup, 
       logout,

@@ -1,0 +1,43 @@
+/* Reusable Select styles (prod: consistent with Input, error states; for forms across app) */
+
+.wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+}
+
+.label {
+  font-size: 0.9rem;
+  color: #333;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.select {
+  background: #ffffff;
+  border: 1px solid #ccc;
+  border-radius: var(--radius-sm);
+  padding: var(--space-sm);
+  color: #1a1a1a;
+  font-size: 0.95rem;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.select:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 2px rgba(124, 92, 255, 0.2);
+}
+
+.select.error {
+  border-color: #ef4444;
+  background: #fef2f2;
+}
+
+.errorText {
+  color: #dc2626;
+  font-size: 0.85rem;
+  font-weight: 500;
+}

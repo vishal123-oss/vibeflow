@@ -1,12 +1,14 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { Button } from '../components/ui/Button';
+import { Modal } from '../components/ui/Modal';
+import { ConfirmModal } from '../components/ui/ConfirmModal';
+import { Select } from '../components/ui/Select';
 import styles from './PermissionsPage.module.css';
 
-// Common categories from backend permissions DB (data/permissions/*.json)
+// Categories from BE permissions DB
 const CATEGORIES = ['rbac', 'boards', 'tasks', 'workspaces', 'users'];
-
-// Sort options for filters (enhanced UX like Jira/Trello admin panels)
 const SORT_OPTIONS = [
   { value: 'id', label: 'ID' },
   { value: 'name', label: 'Name' },

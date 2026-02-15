@@ -1,0 +1,52 @@
+/* Reusable button styles (prod: variants, transitions; used app-wide to replace dupe .btn classes) */
+/* Dark/bold on light where needed; matches theme vars */
+
+.button {
+  padding: var(--space-sm) var(--space-md);
+  border: none;
+  border-radius: var(--radius-sm);
+  font-weight: 600;
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition: all var(--transition-speed) var(--ease-out);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-xs);
+}
+
+.button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Variants for consistency */
+.primary {
+  background: var(--accent);
+  color: #ffffff;
+}
+
+.primary:hover:not(:disabled) {
+  background: var(--accent-hover);
+  box-shadow: var(--accent-glow-subtle);
+  transform: translateY(-1px);
+}
+
+.secondary {
+  background: #f0f0f0;
+  color: #333;
+  border: 1px solid #ccc;
+}
+
+.secondary:hover:not(:disabled) {
+  background: #e0e0e0;
+}
+
+.danger {
+  background: #fee2e2;
+  color: #991b1b;
+}
+
+.danger:hover:not(:disabled) {
+  background: #fecaca;
+}
