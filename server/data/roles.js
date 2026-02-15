@@ -1,13 +1,15 @@
 /**
  * FS-backed roles store (per-role files in data/roles/ folder).
- * Follows boards.js structure: FS ops via storage.js, load role's perms.
- * Roles + associated perms in data/ 'DB' (no constants elsewhere).
- * Defines what roles can do (admin full, user CRUD); supports RBAC guards.
- * Roles entity: e.g., roles-admin.json {id, name, permissions: [permIds], ...}
+ * Follows boards.js/users.js structure for init/seed/reset (now consistent with perms.js extensions).
+ * FS ops via storage.js; resolves perms for RBAC guards/token; hardcoded roles in data/roles/*.json .
+ * No constants outside data/ ; super_admin full CRUD etc.
+ * Roles entity: {id, name, permissions: [permIds], ...}
  */
 
-import { getRecord, getAllRecords, saveRecord, deleteRecord } from '../storage/storage.js';
-import * as permStore from './permissions.js'; // For resolving perms (static from FS 'DB')
+import { getRecord, getAllRecords, saveRecord, deleteRecord, listRecords } from '../storage/storage.js';
+import * as permStore from './permissions.js'; // For resolving/seeding perms (static from FS 'DB')
+import * as usersStore from './users.js'; // For super_admin user init in RBAC flow
+import { generateId as id, now } from '../utils/helpers.js'; // For role CRUD timestamps/IDs
 
 // Load ops (FS 'DB')
 async function loadRole(roleId) {
